@@ -1,2 +1,5 @@
-
+*.pyc
+data/external/*
 .DS_Store
+notebooks/.ipynb_checkpoints/*
+src/data/.ipynb_checkpoints/scrape_genius_lyrics-checkpoint.py
