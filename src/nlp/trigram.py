@@ -92,18 +92,19 @@ def sents_to_tokens(sents, wordset):
     return np.array([utils.canonicalize_word(w, wordset=wordset) 
                      for w in utils.flatten(padded_sentences)], dtype=object)
 
-def build_trigram(file_name='../data/models/trigram-weights', USE_DUMMY_DATA = False):
+def build_trigram(file_name='../../data/models/trigram-weights', USE_DUMMY_DATA = False):
         '''downloads data and preprocesses for feeding into LM, currently only builds nltk corpus'''
+
         if USE_DUMMY_DATA:
             nltk.download('brown') #sample corpus from nltk
             corpus_object = nltk.corpus.brown
-            words = corpus_object.words() #singe list of words 
+            words = corpus_object.words() #singe list of words
         else:
-            lyrics = pd.read_csv('../data/external/songdata.csv', usecols=['text'])
+            lyrics = pd.read_csv('../../data/external/songdata.csv', usecols=['text'])
             full_text = lyrics.text.str.cat()
             words = full_text.split(' ')
-        
-            
+            corpus_object = lyrics.text
+
         train_sents, test_sents = utils.get_train_test_sents(corpus_object, split=0.8, shuffle=True)
         vocab = vocabulary.Vocabulary(utils.canonicalize_word(w) for w in utils.flatten(train_sents))
 
@@ -111,8 +112,10 @@ def build_trigram(file_name='../data/models/trigram-weights', USE_DUMMY_DATA = F
         test_tokens = sents_to_tokens(test_sents, wordset=vocab.wordset)
         vocab = vocabulary.Vocabulary(utils.canonicalize_word(w) for w in utils.flatten(train_sents))
 
+        print("Building trigram...")
         lm = SimpleTrigramLM(train_tokens)
-        
+        print("Built trigram...")
+
         with open('{}.pkl'.format(file_name), 'wb') as outfile:
             pickle.dump(dict(lm.probas), outfile)
 
