@@ -31,13 +31,17 @@ def return_top_hit(query, token, max_retry=5):
         else:
             pass
     assert i+1 != max_retry, "Reached maximum retries."
-            
+    
+    # if response is not none
     try:
         res = json.get('response', {}).get('hits', None).pop(0)
     except IndexError:
         return None
     
-    if res.get('type') == 'song':
+    # otherwise, parse response
+    res_type = res.get('result', {}).get('url').split('-')[-1]
+    
+    if res.get('type') == 'song' and res_type == 'lyrics':
         return res
     else:
         return None
