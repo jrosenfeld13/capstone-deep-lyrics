@@ -119,11 +119,11 @@ def build_vocab(corpus, V=10000, **kw):
     print("Vocabulary: {:,} types".format(vocab.size))
     return vocab
 
-def get_train_test_sents(corpus, split=0.8, shuffle=True):
+def get_train_test_sents(corpus, nltk_corpus=False, split=0.8, shuffle=True):
     """Generate train/test split for unsupervised tasks.
 
     Args:
-      corpus: nltk.corpus that supports sents() function
+      corpus: nltk.corpus that supports sents() function or pandas series
       split (double): fraction to use as training set
       shuffle (int or bool): seed for shuffle of input data, or False to just
       take the training data as the first xx% contiguously.
@@ -132,7 +132,11 @@ def get_train_test_sents(corpus, split=0.8, shuffle=True):
       train_sentences, test_sentences ( list(list(string)) ): the train and test
       splits
     """
-    sentences = np.array(list(corpus.sents()), dtype=object)
+    if nltk_corpus:
+        sentences = np.array(list(corpus.sents()), dtype=object)
+    else:
+        sentences = np.array(corpus.str.split(' '))
+    
     fmt = (len(sentences), sum(map(len, sentences)))
     print("Loaded {:,} sentences ({:g} tokens)".format(*fmt))
 
