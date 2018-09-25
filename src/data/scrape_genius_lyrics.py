@@ -28,7 +28,7 @@ def return_top_hit(query, token, max_retry=5):
         if response.status_code == 200:
             json = response.json()
             break
-        elif i+1 < max_retry:
+        elif i+1 <= max_retry:
             time.sleep(2 ** i)
             pass
         else:
@@ -53,9 +53,20 @@ def extract_url(hit):
     """Extract URL"""
     return hit.get('result', {}).get('url')
 
-def extract_lyrics(url):
-    page = requests.get(url)
-    html = BeautifulSoup(page.content, "html.parser")
+def extract_lyrics(url, max_retry=5):
+    
+    # request with backoff
+    for i in range(max_retry):
+        page = requests.get(url)
+        if page.status_code == 200:
+            html = BeautifulSoup(page.content, "html.parser")
+            break
+        elif i+1 <= max_retry:
+            time.sleep(2 ** i)
+        else:
+            pass
+    assert i+1 != max_retry, "Reached maximum retries."
+    
     lyrics = html.find("div", class_="lyrics").get_text()
     return lyrics
 
