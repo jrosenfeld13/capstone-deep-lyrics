@@ -183,40 +183,9 @@ if __name__ == '__main__':
         tup = (row.trackid, [artist, title])
         songs.append(tup)
         
-    _success, metafile = get_metadata(songs[:20], token=GENIUS, batchsize=500,
-                            outfile='../../data/interim/test_metadata.csv')
+    _success, metafile = get_metadata(songs, token=GENIUS, batchsize=500,
+                            outfile='../../data/interim/genius_metadata.csv')
                         
     assert _success, "Input rows don't match output rows"
     
-    get_lyrics(metafile, outfile='../../data/interim/test_lyrics.csv')
-    # # use genius search api to retrieve song URL (first hit)
-    # genius = []
-    # for song in tqdm(songs, desc="Genius Search API"):
-    #     trackid, search_terms = song
-    #     hit = return_top_hit(search_terms, token=GENIUS)
-    #     tup = [trackid, hit]
-    #     genius.append(tup)
-    #
-    # # serialize
-    # with open('../../data/interim/genius_metadata.json', 'w') as outfile:
-    #     json.dump(genius, outfile)
-        
-    # # pull lyrics with URL (no token needed here)
-    # with open('../../data/interim/genius_metadata.json', 'r') as f:
-    #     genius = json.load(f)
-    #
-    # lyrics = []
-    # for song in tqdm(genius, desc="Pulling Lyrics"):
-    #     trackid = song[0]
-    #
-    #     if song[1] is not None:
-    #         track_url = extract_url(song[1])
-    #         track_lyrics = extract_lyrics(track_url)
-    #         tup = [trackid, track_lyrics]
-    #     else:
-    #         tup = [trackid, None]
-    #     lyrics.append(tup)
-    #
-    # # serialize
-    # with open('../../data/interim/genius_lyrics.json', 'w') as outfile:
-    #     json.dump(lyrics, outfile)
+    get_lyrics(metafile, outfile='../../data/interim/genius_lyrics.csv')
