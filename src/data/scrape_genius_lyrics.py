@@ -133,7 +133,7 @@ def get_metadata(songs, token, outfile, batchsize=100):
     if len(songs) == _rows:
         return True, outfile
 
-def get_lyrics(meta_file, outfile):
+def get_lyrics(meta_file, outfile, start_from=0):
     """
     Args
       meta_file (path) : file produced by `get_metadata`
@@ -143,12 +143,18 @@ def get_lyrics(meta_file, outfile):
     with open(meta_file, 'r') as f:
         row_count = sum(1 for row in f)
     row_count -= 1
+    # starting index
+    row_count -= start_from
     
     # stream metadata file and output line by line
     with open(meta_file, 'r') as f:
         rd = csv.reader(f)
         # skip header
         next(rd)
+        # skip starting index
+        for ix in range(start_from):
+            next(rd)
+            
         for row in tqdm(rd, desc="Genius Pull Lyrics", total=row_count):
             if row[2]: # if URL exists
                 msd_id = row[0]
@@ -164,7 +170,7 @@ def get_lyrics(meta_file, outfile):
     return None
 
 def main(msd_tracklist, start_from=0, outpath='../../data/interim',
-         lyrics_only=False):
+         lyrics_only=False, start_lyrics_from=0):
     
     assert os.path.isdir(outpath),\
     "Outpath directory does not exist."
@@ -193,7 +199,7 @@ def main(msd_tracklist, start_from=0, outpath='../../data/interim',
                         
         # assert _success, "Input rows don't match output rows"
     
-    get_lyrics(metafile, outfile=outpath+'/genius_lyrics.csv')
+    get_lyrics(metafile, outfile=outpath+'/genius_lyrics.csv', start_from=start_lyrics_from)
     
 if __name__ == '__main__':
     
@@ -213,8 +219,13 @@ if __name__ == '__main__':
                         action='store_const',
                         default=False,
                         const=True)
+    parser.add_argument('-s',
+                        help='start number index on `genius_metadata`',
+                        default=0,
+                        type=int
+                        )
     args = parser.parse_args()
     
     # run main
-    main(args.tracklist, start_from=args.n,
+    main(args.tracklist, start_from=args.n, start_lyrics_from=args.s,
          outpath=args.o, lyrics_only=args.lyrics_only)
