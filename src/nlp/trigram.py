@@ -1,3 +1,4 @@
+import argparse
 import pandas as pd
 import numpy as np
 from collections import defaultdict
@@ -16,11 +17,11 @@ def normalize_counter(c):
 
 
 class SimpleTrigramLM(object):
-    def __init__(self, words, probas_file=None):
+    def __init__(self, words, infile=None):
         """Build our simple trigram model."""
         #if pre-defined model is provided, use that as probabilities
-        if probas_file:
-            with open('{}.pkl'.format(probas_file), 'rb') as main_dict:
+        if infile:
+            with open(infile, 'rb') as main_dict:
                 self.probas = pickle.load(main_dict)
         
         else:
@@ -92,32 +93,48 @@ def sents_to_tokens(sents, wordset):
     return np.array([utils.canonicalize_word(w, wordset=wordset) 
                      for w in utils.flatten(padded_sentences)], dtype=object)
 
-def build_trigram(file_name='../data/models/trigram-weights', USE_DUMMY_DATA = False):
-        '''downloads data and preprocesses for feeding into LM, currently only builds nltk corpus'''
+def build_trigram(infile='../../data/external/songdata.csv',
+                  outfile='../../data/models/trigram-weights.pkl',
+                  USE_DUMMY_DATA = False):
+        '''            
+        Downloads data and preprocesses for feeding into LM. The data *must* be a csv and have a column called 'text'
+        
+        Parameters
+        ----------
+        infile : str
+        `infile` is a str representing a path to a csv file with a single column titled 'text'
+        '''
+
         if USE_DUMMY_DATA:
             nltk.download('brown') #sample corpus from nltk
             corpus_object = nltk.corpus.brown
-            words = corpus_object.words() #singe list of words 
+            words = corpus_object.words() #singe list of words
         else:
-            lyrics = pd.read_csv('../data/external/songdata.csv', usecols=['text'])
+            lyrics = pd.read_csv(infile, usecols=['text'])
             full_text = lyrics.text.str.cat()
             words = full_text.split(' ')
-        
-            
+            corpus_object = lyrics.text
+
         train_sents, test_sents = utils.get_train_test_sents(corpus_object, split=0.8, shuffle=True)
         vocab = vocabulary.Vocabulary(utils.canonicalize_word(w) for w in utils.flatten(train_sents))
 
+        print("Tokenizing sentences...")
         train_tokens = sents_to_tokens(train_sents, wordset=vocab.wordset)
         test_tokens = sents_to_tokens(test_sents, wordset=vocab.wordset)
         vocab = vocabulary.Vocabulary(utils.canonicalize_word(w) for w in utils.flatten(train_sents))
 
+        print("Building trigram...")
         lm = SimpleTrigramLM(train_tokens)
-        
-        with open('{}.pkl'.format(file_name), 'wb') as outfile:
-            pickle.dump(dict(lm.probas), outfile)
+        print("Built trigram...")
 
-def main():
-    build_trigram()
+        with open(outfile, 'wb') as f:
+            pickle.dump(dict(lm.probas), f)
+
     
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--infile', type=str, default='../../data/external/songdata.csv')
+    parser.add_argument('--outfile', type=str, default='../../data/models/trigram-weights.pkl')
+    args = parser.parse_args()
+
+    build_trigram(args.infile, args.outfile)
