@@ -3,6 +3,7 @@ import os, requests, time, re, json, sys, csv
 from tqdm import tqdm
 import pandas as pd
 from dotenv import load_dotenv
+import argparse
 
 def return_top_hit(query, token, max_retry=5):
     """
@@ -161,19 +162,20 @@ def get_lyrics(meta_file, outfile):
                     wt.writerow(tup)
                     
     return None
+
+def main(msd_tracklist, start_from=0, outpath='../../data/interim'):
     
-if __name__ == '__main__':
+    assert os.path.isdir(outpath),\
+    "Outpath directory does not exist."
     
     load_dotenv()
     GENIUS = os.getenv("GENIUS")
 
-    # assert len(sys.argv) == 2,\
-    # 'Required arg missing: MSD unique tracklist'
-    
-    ut = '../../data/external/MillionSongSubset/AdditionalFiles/subset_unique_tracks.txt'
+    # ut = '../../data/external/MillionSongSubset/AdditionalFiles/subset_unique_tracks.txt'
 
-    df = pd.read_csv(ut, sep='<SEP>', header=None, engine='python',
-                     names=['trackid', 'songid', 'artist', 'title'])
+    df = pd.read_csv(msd_tracklist, sep='<SEP>', header=None, engine='python',
+                     names=['trackid', 'songid', 'artist', 'title'],
+                     skiprows=start_from)
     
     # build search terms from track list
     songs = []
@@ -184,8 +186,29 @@ if __name__ == '__main__':
         songs.append(tup)
         
     _success, metafile = get_metadata(songs, token=GENIUS, batchsize=500,
-                            outfile='../../data/interim/genius_metadata.csv')
+                            outfile=outpath+'/genius_metadata.csv')
                         
     assert _success, "Input rows don't match output rows"
     
-    get_lyrics(metafile, outfile='../../data/interim/genius_lyrics.csv')
+    get_lyrics(metafile, outfile=outpath+'/genius_lyrics.csv')
+    
+if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('tracklist',
+                        help='filepath to MSD unique tracks text file')
+    parser.add_argument('-o',
+                        help='outpath to store metadata and lyrics',
+                        default='../../data/interim')
+    parser.add_argument('-n',
+                        help='start number index on `tracklist`',
+                        default=0,
+                        type=int)
+                        
+    args = parser.parse_args()
+    
+    # assert len(sys.argv) == 2,\
+    # 'Missing required arguments: MSD unique tracklist'
+
+    
+    main(args.tracklist, start_from=args.n, outpath=args.o)
