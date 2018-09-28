@@ -93,16 +93,16 @@ def sents_to_tokens(sents, wordset):
     return np.array([utils.canonicalize_word(w, wordset=wordset) 
                      for w in utils.flatten(padded_sentences)], dtype=object)
 
-def build_trigram(infile='../../data/external/songdata.csv',
+def build_trigram(infile='../../data/interim/genius_lyrics.csv',
                   outfile='../../data/models/trigram-weights.pkl',
                   USE_DUMMY_DATA = False):
         '''            
-        Downloads data and preprocesses for feeding into LM. The data *must* be a csv and have a column called 'text'
+        Downloads data and preprocesses for feeding into LM. The data *must* be a csv and have a column called 'lyrics'
         
         Parameters
         ----------
         infile : str
-        `infile` is a str representing a path to a csv file with a single column titled 'text'
+        `infile` is a str representing a path to a csv file with a single column titled 'lyrics'
         '''
 
         if USE_DUMMY_DATA:
@@ -110,7 +110,7 @@ def build_trigram(infile='../../data/external/songdata.csv',
             corpus_object = nltk.corpus.brown
             words = corpus_object.words() #singe list of words
         else:
-            lyrics = pd.read_csv(infile, usecols=['text'])
+            lyrics = pd.read_csv(infile, usecols=['lyrcs'])
             full_text = lyrics.text.str.cat()
             words = full_text.split(' ')
             corpus_object = lyrics.text
