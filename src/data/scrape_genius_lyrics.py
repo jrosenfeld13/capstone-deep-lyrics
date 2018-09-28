@@ -163,37 +163,41 @@ def get_lyrics(meta_file, outfile):
                     
     return None
 
-def main(msd_tracklist, start_from=0, outpath='../../data/interim'):
+def main(msd_tracklist, start_from=0, outpath='../../data/interim',
+         lyrics_only=False):
     
     assert os.path.isdir(outpath),\
     "Outpath directory does not exist."
     
-    load_dotenv()
-    GENIUS = os.getenv("GENIUS")
-
-    # ut = '../../data/external/MillionSongSubset/AdditionalFiles/subset_unique_tracks.txt'
-
-    df = pd.read_csv(msd_tracklist, sep='<SEP>', header=None, engine='python',
-                     names=['trackid', 'songid', 'artist', 'title'],
-                     skiprows=start_from)
+    metafile = outpath+'/genius_metadata.csv'
     
-    # build search terms from track list
-    songs = []
-    for row in df.itertuples(index=False):
-        artist = remove_parentheses(str(row.artist).lower())
-        title = remove_parentheses(str(row.title).lower())
-        tup = (row.trackid, [artist, title])
-        songs.append(tup)
+    if not lyrics_only:
         
-    _success, metafile = get_metadata(songs, token=GENIUS, batchsize=500,
-                            outfile=outpath+'/genius_metadata.csv')
+        load_dotenv()
+        GENIUS = os.getenv("GENIUS")
+
+        df = pd.read_csv(msd_tracklist, sep='<SEP>', header=None, engine='python',
+                         names=['trackid', 'songid', 'artist', 'title'],
+                         skiprows=start_from)
+        
+        # build search terms from track list
+        songs = []
+        for row in df.itertuples(index=False):
+            artist = remove_parentheses(str(row.artist).lower())
+            title = remove_parentheses(str(row.title).lower())
+            tup = (row.trackid, [artist, title])
+            songs.append(tup)
+            
+        _success, metafile = get_metadata(songs, token=GENIUS, batchsize=500,
+                                outfile=outpath+'/genius_metadata.csv')
                         
-    assert _success, "Input rows don't match output rows"
+        # assert _success, "Input rows don't match output rows"
     
     get_lyrics(metafile, outfile=outpath+'/genius_lyrics.csv')
     
 if __name__ == '__main__':
     
+    # arg parser
     parser = argparse.ArgumentParser()
     parser.add_argument('tracklist',
                         help='filepath to MSD unique tracks text file')
@@ -204,11 +208,13 @@ if __name__ == '__main__':
                         help='start number index on `tracklist`',
                         default=0,
                         type=int)
-                        
+    parser.add_argument('--lyrics-only',
+                        help='Assume meta data has already been pulled',
+                        action='store_const',
+                        default=False,
+                        const=True)
     args = parser.parse_args()
     
-    # assert len(sys.argv) == 2,\
-    # 'Missing required arguments: MSD unique tracklist'
-
-    
-    main(args.tracklist, start_from=args.n, outpath=args.o)
+    # run main
+    main(args.tracklist, start_from=args.n,
+         outpath=args.o, lyrics_only=args.lyrics_only)
