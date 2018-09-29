@@ -110,10 +110,10 @@ def build_trigram(infile='../../data/interim/genius_lyrics.csv',
             corpus_object = nltk.corpus.brown
             words = corpus_object.words() #singe list of words
         else:
-            lyrics = pd.read_csv(infile, usecols=['lyrcs'])
-            full_text = lyrics.text.str.cat()
+            lyrics = pd.read_csv(infile, usecols=['lyrics'])
+            full_text = lyrics.lyrics.str.cat()
             words = full_text.split(' ')
-            corpus_object = lyrics.text
+            corpus_object = lyrics.lyrics
 
         train_sents, test_sents = utils.get_train_test_sents(corpus_object, split=0.8, shuffle=True)
         vocab = vocabulary.Vocabulary(utils.canonicalize_word(w) for w in utils.flatten(train_sents))
