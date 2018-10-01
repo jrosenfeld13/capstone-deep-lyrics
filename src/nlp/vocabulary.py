@@ -1,6 +1,6 @@
 from collections import defaultdict, Counter
 
-import constants
+from . import constants
 
 class Vocabulary(object):
 

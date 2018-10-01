@@ -4,11 +4,11 @@ import numpy as np
 from collections import defaultdict
 
 import nltk
-import utils, vocabulary
-
+from . import utils, vocabulary
 
 from collections import defaultdict
 import pickle
+import wget
 
 def normalize_counter(c):
     """Given a dictionary of <item, counts>, return <item, fraction>."""
@@ -17,13 +17,20 @@ def normalize_counter(c):
 
 
 class SimpleTrigramLM(object):
-    def __init__(self, words, infile=None):
+    def __init__(self, words, infile=None, cloudstore=False):
         """Build our simple trigram model."""
         #if pre-defined model is provided, use that as probabilities
         if infile:
-            with open(infile, 'rb') as main_dict:
-                self.probas = pickle.load(main_dict)
+            if cloudstore:
+                url = infile
+                wget.download(url, '/tmp/model-weights.pkl')
+                with open('/tmp/model-weights.pkl', 'rb') as main_dict:
+                    self.probas = pickle.load(main_dict)
+            else:
+                with open(infile, 'rb') as main_dict:
+                    self.probas = pickle.load(main_dict)
         
+        #otherwise if no model is provided, we need to compute our entire model
         else:
             # Raw trigram counts over the corpus. 
             # c(w | w_1 w_2) = self.counts[(w_2,w_1)][w]
@@ -75,14 +82,15 @@ class SimpleTrigramLM(object):
     
     def generate_text(self, max_length=40):
         seq = ["<s>", "<s>"]
-        for i in range(max_length):
+        for _ in range(max_length):
             seq.append(self.predict_next(seq))
             # Stop at end-of-sentence
             if seq[-1] == "</s>": break
-        print(" ".join(seq))
+        text = " ".join(seq)
+        print(text)
+        return text
 
-        
-        
+           
 # "canonicalize_word" performs a few tweaks to the token stream of
 # the corpus.  For example, it replaces digits with DG allowing numbers
 # to aggregate together when we count them below.
@@ -93,7 +101,7 @@ def sents_to_tokens(sents, wordset):
     return np.array([utils.canonicalize_word(w, wordset=wordset) 
                      for w in utils.flatten(padded_sentences)], dtype=object)
 
-def build_trigram(infile='../../data/interim/genius_lyrics.csv',
+def build_trigram(infile='https://storage.googleapis.com/capstone-deep-lyrics/songdata.csv',
                   outfile='../../data/models/trigram-weights.pkl',
                   USE_DUMMY_DATA = False):
         '''            
@@ -103,6 +111,14 @@ def build_trigram(infile='../../data/interim/genius_lyrics.csv',
         ----------
         infile : str
         `infile` is a str representing a path to a csv file with a single column titled 'lyrics'
+        
+        outfile : str
+        `outfile` is a str representing a path to a pkl file to save model weights
+        
+        Returns
+        ----------
+        None : NoneType
+        function saves model weights locally
         '''
 
         if USE_DUMMY_DATA:
@@ -133,8 +149,9 @@ def build_trigram(infile='../../data/interim/genius_lyrics.csv',
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--infile', type=str, default='../../data/external/songdata.csv')
+    parser.add_argument('--infile', type=str, default='https://storage.googleapis.com/capstone-deep-lyrics/songdata.csv')
     parser.add_argument('--outfile', type=str, default='../../data/models/trigram-weights.pkl')
+    
     args = parser.parse_args()
 
     build_trigram(args.infile, args.outfile)
