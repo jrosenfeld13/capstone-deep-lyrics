@@ -3,6 +3,7 @@ import os, requests, time, re, json, sys, csv
 from tqdm import tqdm
 import pandas as pd
 from dotenv import load_dotenv
+import argparse
 
 def return_top_hit(query, token, max_retry=5):
     """
@@ -132,7 +133,7 @@ def get_metadata(songs, token, outfile, batchsize=100):
     if len(songs) == _rows:
         return True, outfile
 
-def get_lyrics(meta_file, outfile):
+def get_lyrics(meta_file, outfile, start_from=0):
     """
     Args
       meta_file (path) : file produced by `get_metadata`
@@ -142,12 +143,18 @@ def get_lyrics(meta_file, outfile):
     with open(meta_file, 'r') as f:
         row_count = sum(1 for row in f)
     row_count -= 1
+    # starting index
+    row_count -= start_from
     
     # stream metadata file and output line by line
     with open(meta_file, 'r') as f:
         rd = csv.reader(f)
         # skip header
         next(rd)
+        # skip starting index
+        for ix in range(start_from):
+            next(rd)
+            
         for row in tqdm(rd, desc="Genius Pull Lyrics", total=row_count):
             if row[2]: # if URL exists
                 msd_id = row[0]
@@ -161,31 +168,64 @@ def get_lyrics(meta_file, outfile):
                     wt.writerow(tup)
                     
     return None
+
+def main(msd_tracklist, start_from=0, outpath='../../data/interim',
+         lyrics_only=False, start_lyrics_from=0):
+    
+    assert os.path.isdir(outpath),\
+    "Outpath directory does not exist."
+    
+    metafile = outpath+'/genius_metadata.csv'
+    
+    if not lyrics_only:
+        
+        load_dotenv()
+        GENIUS = os.getenv("GENIUS")
+
+        df = pd.read_csv(msd_tracklist, sep='<SEP>', header=None, engine='python',
+                         names=['trackid', 'songid', 'artist', 'title'],
+                         skiprows=start_from)
+        
+        # build search terms from track list
+        songs = []
+        for row in df.itertuples(index=False):
+            artist = remove_parentheses(str(row.artist).lower())
+            title = remove_parentheses(str(row.title).lower())
+            tup = (row.trackid, [artist, title])
+            songs.append(tup)
+            
+        _success, metafile = get_metadata(songs, token=GENIUS, batchsize=500,
+                                outfile=outpath+'/genius_metadata.csv')
+                        
+        # assert _success, "Input rows don't match output rows"
+    
+    get_lyrics(metafile, outfile=outpath+'/genius_lyrics.csv', start_from=start_lyrics_from)
     
 if __name__ == '__main__':
     
-    load_dotenv()
-    GENIUS = os.getenv("GENIUS")
-
-    # assert len(sys.argv) == 2,\
-    # 'Required arg missing: MSD unique tracklist'
+    # arg parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument('tracklist',
+                        help='filepath to MSD unique tracks text file')
+    parser.add_argument('-o',
+                        help='outpath to store metadata and lyrics',
+                        default='../../data/interim')
+    parser.add_argument('-n',
+                        help='start number index on `tracklist`',
+                        default=0,
+                        type=int)
+    parser.add_argument('--lyrics-only',
+                        help='Assume meta data has already been pulled',
+                        action='store_const',
+                        default=False,
+                        const=True)
+    parser.add_argument('-s',
+                        help='start number index on `genius_metadata`',
+                        default=0,
+                        type=int
+                        )
+    args = parser.parse_args()
     
-    ut = '../../data/external/MillionSongSubset/AdditionalFiles/subset_unique_tracks.txt'
-
-    df = pd.read_csv(ut, sep='<SEP>', header=None, engine='python',
-                     names=['trackid', 'songid', 'artist', 'title'])
-    
-    # build search terms from track list
-    songs = []
-    for row in df.itertuples(index=False):
-        artist = remove_parentheses(str(row.artist).lower())
-        title = remove_parentheses(str(row.title).lower())
-        tup = (row.trackid, [artist, title])
-        songs.append(tup)
-        
-    _success, metafile = get_metadata(songs, token=GENIUS, batchsize=500,
-                            outfile='../../data/interim/genius_metadata.csv')
-                        
-    assert _success, "Input rows don't match output rows"
-    
-    get_lyrics(metafile, outfile='../../data/interim/genius_lyrics.csv')
+    # run main
+    main(args.tracklist, start_from=args.n, start_lyrics_from=args.s,
+         outpath=args.o, lyrics_only=args.lyrics_only)
