@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<title>Deep Lyrics</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+<link rel="stylesheet" href="styles.css">
+<script type="text/javascript" src="bundle.js" ></script>
+<style>
+body,h1,h2,h3,h4,h5 {font-family: "Poppins", sans-serif}
+body {font-size:16px;}
+.w3-half img{margin-bottom:-6px;margin-top:16px;opacity:0.8;cursor:pointer}
+.w3-half img:hover{opacity:1}
+</style>
+<body>
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-red w3-collapse w3-top w3-large w3-padding" style="z-index:3;width:300px;font-weight:bold;" id="mySidebar"><br>
+  <a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-hide-large w3-display-topleft" style="width:100%;font-size:22px">Close Menu</a>
+  <div class="w3-container">
+    <h3 class="w3-padding-64"><b>Deep<br>Lyrics</b></h3>
+  </div>
+  <div class="w3-bar-block">
+    <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a>
+    <a href="#try" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Try it out!</a>
+    <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Meet the team</a>
+  </div>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-container w3-top w3-hide-large w3-red w3-xlarge w3-padding">
+  <a href="javascript:void(0)" class="w3-button w3-red w3-margin-right" onclick="w3_open()">☰</a>
+  <span>Deep Lyrics</span>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:340px;margin-right:40px">
+
+  <!-- Header -->
+  <div class="w3-container" style="margin-top:80px" id="showcase">
+    <h1 class="w3-jumbo"><b>Deep Lyrics</b></h1>
+    <h1 class="w3-xxxlarge w3-text-red"><b>Deep learning based lyrics generator</b></h1>
+  </div>
+
+
+  <!-- Home -->
+  <div class="w3-container" id="home" >
+    <!-- <h1 class="w3-xxxlarge w3-text-red"><b>Services.</b></h1> -->
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+    <p>We are a interior design service that focus on what's best for your home and what's best for you!</p>
+    <p>Some text about our services - what we do and what we offer. We are lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor
+    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </p>
+  </div>
+
+  <!-- Try -->
+  <div class="w3-container" id="try" style="margin-top:75px">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Try it out</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+    <p>Do you want to try our lyrics generator? Customize your lyrics below and we'll create the best lyrics for your song!</p>
+    <form action="javascript:generateLyrics()">
+      <div class="w3-section">
+        <label>Song name</label>
+        <input class="w3-input w3-border" type="text" name="SongName">
+      </div>
+      <div class="w3-section">
+        <label>Tags</label>
+        <input class="w3-input w3-border" type="text" name="Tags" >
+      </div>
+      <button type="submit" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Generate lyrics</button>
+    </form>
+
+    <!-- Lyrics display-->
+    <div id="lyrics_div" class="m4 w3-margin-bottom" style="display:none" >
+        <div class="w3-light-grey">
+          <div class="w3-container">
+            <h3>Generated lyrics:</h3>
+            <p id="lyrics_p"></p>
+          </div>
+        </div>
+      </div>
+  </div>
+    
+  <!-- The team -->
+  <div class="w3-container" id="team" style="margin-top:75px">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Meet the team!</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+    <p>The best team in the world.</p>
+    <p>We are lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor
+    incididunt ut labore et quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </p>
+  </div>
+
+  <!-- The Team -->
+  <div class="w3-row-padding w3-grayscale">
+    <div class="w3-col m4 w3-margin-bottom">
+      <div class="w3-light-grey">
+        <!-- <img src="/w3images/team2.jpg" alt="John" style="width:100%"> -->
+        <div class="w3-container">
+          <h3>Steve</h3>
+          <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+        </div>
+      </div>
+    </div>
+    <div class="w3-col m4 w3-margin-bottom">
+      <div class="w3-light-grey">
+        <!-- <img src="/w3images/team1.jpg" alt="Jane" style="width:100%"> -->
+        <div class="w3-container">
+          <h3>Jason</h3>
+          <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+        </div>
+      </div>
+    </div>
+    <div class="w3-col m4 w3-margin-bottom">
+      <div class="w3-light-grey">
+        <!-- <img src="/w3images/team3.jpg" alt="Mike" style="width:100%"> -->
+        <div class="w3-container">
+          <h3>Justin</h3>
+          <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+        </div>
+      </div>
+    </div>
+    <div class="w3-col m4 w3-margin-bottom">
+      <div class="w3-light-grey">
+        <!-- <img src="/w3images/team3.jpg" alt="Mike" style="width:100%"> -->
+        <div class="w3-container">
+          <h3>Carlos</h3>
+          <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- End page content -->
+</div>
+
+<!-- W3.CSS Container -->
+<div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px;padding-right:58px"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
+
+<script>
+
+// Handle lyric generation request
+function generateLyrics() {
+
+    const url = 'http://localhost:8080'
+    fetch(`${url}/lyrics`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+      })
+      
+    }).then(function(response) {
+        return response.text();
+    }).then(function(text) {
+        showLyrics(text);
+    }).catch(function(ex) {
+      alert(`response failed ${ex}`);
+    });
+}
+
+// Script to open and close sidebar
+function w3_open() {
+    document.getElementById("mySidebar").style.display = "block";
+    document.getElementById("myOverlay").style.display = "block";
+}
+
+function w3_close() {
+    document.getElementById("mySidebar").style.display = "none";
+    document.getElementById("myOverlay").style.display = "none";
+}
+
+function showLyrics(lyrics) {
+  document.getElementById("lyrics_div").style.display = "block";
+  var captionText = document.getElementById("lyrics_p");
+  captionText.innerText = lyrics;
+}
+</script>
+
+</body>
+</html>
