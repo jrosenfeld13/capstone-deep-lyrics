@@ -94,7 +94,7 @@ print("Now Scraping: ", meta.count())
 
 # 3. Scrape Lyrics and dump to GCS
 if meta.count() > 0:
-    meta.repartition(10)
+    meta = meta.repartition(10)
     rdd = meta.mapValues(extract_lyrics)
     df = rdd.toDF(['msd_id', 'lyrics'])
     # df2 = df.collect()
