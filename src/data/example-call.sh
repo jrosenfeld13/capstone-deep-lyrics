@@ -5,8 +5,8 @@
 #   done
 # done
 
-bash start-dataproc-cluster.sh -w 12 -g us-central1-f; \
-bash start-dataproc-job.sh gs:///genius-meta/metadata_part_ag; \
+bash start-dataproc-cluster.sh -w 12 -g us-west1-a; \
+bash start-dataproc-job.sh gs:///genius-meta/metadata_part_ab; \
 gcloud dataproc clusters delete w210-capstone --quiet
 
 # verify what is causing failure in metadata_part_as
