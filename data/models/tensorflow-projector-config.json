@@ -1,0 +1,13 @@
+{
+  "embeddings": [
+    {
+      "tensorName": "DeepLyrics Embeddings v01",
+      "tensorShape": [
+        10000,
+        400
+      ],
+      "tensorPath": "https://storage.googleapis.com/w210-capstone/models/embeddings.csv",
+      "metadataPath": "https://storage.googleapis.com/w210-capstone/models/embeddings_meta.csv"
+    }
+  ]
+}
