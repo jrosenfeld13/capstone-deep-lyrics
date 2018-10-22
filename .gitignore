@@ -1,5 +1,8 @@
+<<<<<<< HEAD
+=======
 data/interim/genius_scrape/metadata_part_*
 data/interim/test_data/*
+>>>>>>> master
 data/interim/*
 **/__pycache__/**
 **/node_modules/**
