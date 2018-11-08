@@ -82,3 +82,32 @@ class MultimodalRNNLearner():
     RNN Learner extended to multimodality with aggregate audio data.
     """
     pass
+
+def map_weights(learner, pretrained_weights, pretrained_vocab, pretrained_to_multi):
+    """
+    Special case of loading pretrained weights for multimodal model.
+    Does the following:
+        1. Convert encoder/decoder vocab weights
+        2. Map the names of the weights from the pretrained wikitext103 to multimodal
+        3. For the multimodal weights, random initialize and concatenate
+        4. Load Weights
+    """
+    # 1)
+    old_itos = pickle.load(open(pretrained_vocab, 'rb'))
+    old_stoi = {v:k for k,v in enumerate(old_itos)}
+    wgts = torch.load(pretrained_weights, map_location=lambda storage, loc: storage)
+    wgts = convert_weights(wgts, old_stoi, learner.data.train_ds.vocab.itos)
+    
+    #2)
+    for k, v in pretrained_to_multi.items():
+        wgts[v] = wgts.pop(k)
+        
+    #3)
+    h1_dim = wgts['multimode.0.module.weight_ih_l0'].shape[0]
+    random_init = torch.randn(h1_dim, learner.model.audio_sz)
+    h1_z1 = torch.cat([wgts['multimode.0.module.weight_ih_l0'],
+                       random_init], dim=1)
+    wgts['multimode.0.module.weight_ih_l0'] = h1_z1
+    
+    #4)
+    learner.model.load_state_dict(wgts)
