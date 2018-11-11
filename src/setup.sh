@@ -35,3 +35,11 @@ jupyter labextension install @jupyter-widgets/jupyterlab-manager
 conda install -c pytorch pytorch-nightly cuda92
 conda install -c fastai torchvision-nightly
 conda install -c fastai fastai
+
+sudo apt-get install graphviz
+
+conda install -c anaconda graphviz
+conda install -c conda-forge python-graphviz
+conda install pydot
+
+sudo apt-get install xdg-utils
