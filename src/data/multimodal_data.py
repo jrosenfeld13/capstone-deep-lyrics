@@ -58,12 +58,13 @@ class MultimodalDataLoader(LanguageModelLoader):
         nb = np.sum(audio_data.text_length) // self.bs # words per batch
         
         # repeat audio features
-        repeated_audio = np.empty((0, self.audio_dataset.feature_size))
+        total_length = np.sum(audio_data.text_length)
+        repeated_audio = np.empty((total_length, self.audio_dataset.feature_size))
+        array_at = 0
         for song in zip(audio_data.data, audio_data.text_length):
             features, song_length = song
-            repeated_audio = np.append(repeated_audio,
-                                       np.tile(features, (song_length, 1)),
-                                       axis=0)
+            repeated_audio[array_at:array_at+song_length, :] = features
+            array_at += song_length
         
         # reshape to (nb * bs)
         audio = repeated_audio[:nb*self.bs]\
