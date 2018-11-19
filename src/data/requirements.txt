@@ -1,6 +1,0 @@
-requests
-tqdm
-python-dotenv
-pandas
-numpy
-beautifulsoup4
