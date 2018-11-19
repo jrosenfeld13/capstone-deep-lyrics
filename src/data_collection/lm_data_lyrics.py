@@ -19,7 +19,7 @@ def tokenize_lyrics(lyrics):
                                           discard_empty=False)
     re_tokd = re_tk.tokenize_sents(tokd)
     
-    [s.insert(0, f'xBOL {line_num + 1}') for line_num, s in enumerate(re_tokd)] # insert start token for each line
+    [s.insert(0, f'xBOL {line_num+1}') for line_num, s in enumerate(re_tokd)] # insert start token for each line
     [s.append('xEOL') for s in re_tokd] # append end token for each line
     
     flat = list(itertools.chain(*re_tokd))
