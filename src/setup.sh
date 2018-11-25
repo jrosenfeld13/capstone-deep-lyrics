@@ -43,3 +43,5 @@ conda install -c conda-forge python-graphviz
 conda install pydot
 
 sudo apt-get install xdg-utils
+
+conda install networkx
