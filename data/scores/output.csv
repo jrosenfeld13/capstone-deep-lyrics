@@ -1,0 +1,6 @@
+"filename","POSConfirmity","RD_PerfectAll","RD_PerfectEnd","RD_VowelAll","RD_VowelEnd","ClosestMeter","AvgDistanceToMeter","BLEU_1_excl_Unsmoothed","BLEU_2_excl_Unsmoothed","BLEU_3_excl_Unsmoothed","BLEU_4_excl_Unsmoothed","BLEU_3_cumul_Smoothed","BLEU_4_cumul_Smoothed"
+"samp1.txt",0.3137,0.25,0.4,0.6667,0.4,"Iambic trimeter",3.1429,1.0,1.0,1.0,1.0,1.1539,1.1167
+"samp2.txt",0.8721,0.4286,0.3333,0.5714,0.3333,"Trochaic tetrameter",0.5,1.0,1.0,1.0,1.0,1.1539,1.1167
+"samp3.txt",0.7037,0.4667,0.5,0.5833,0.5,"Iambic dimeter",3.4118,1.0,1.0,1.0,1.0,1.1539,1.1167
+"samp4.txt",0.7635,0.4242,0.4118,0.6364,0.5882,"Iambic dimeter",2.5,1.0,1.0,1.0,1.0,1.1539,1.1167
+"samp5.txt",0.4291,0.4706,0.4667,0.6765,0.6,"Iambic tetrameter",2.9375,1.0,1.0,1.0,1.0,1.1539,1.1167

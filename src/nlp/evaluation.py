@@ -10,6 +10,9 @@ import copy
 #!pip install pronouncing
 import pronouncing
 import numpy as np
+#import os
+import glob
+import csv
 
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
@@ -48,8 +51,26 @@ def get_perplexity(text, model, _n = 3, _lpad = ['<s>'], _rpad = ['<s>']):
     return np.power(2,get_entropy(text=text, model=model , _n=_n, _lpad=_lpad, _rpad=_rpad))
 
 
+### some basic preprocessing techniques
+def prepString(s):
+    '''removes punctuation other than apostrophes from string'''
+    return str(s).lower().translate({ord(c): None for c in string.punctuation if c not in ("'")})
+
+def removePunc(s):
+    '''removes punctuation from string'''
+    return str(s).lower().translate({ord(c): None for c in string.punctuation})
+
+def removeMarkupWords(s):
+    '''removes positional words generated in lyrics'''
+    s = str(s).lower()
+    for term in ['xeol','xbol','xeos','xbos','[verse-1]','[verse-2]','[chorus]']:
+        s = str(s).replace(term,'')
+    return s    
+    
+
 ### POS tagging
 
+# POS tagging and aggregation to % of text
 def nltkPOS(text,verbose=False):
     '''For an input text, return absolute difference from published proportions, between 0 and 1.'''
     
@@ -65,11 +86,12 @@ def nltkPOS(text,verbose=False):
     # initialize
     pos_cnt = Counter()
     total_word_cnt = 0
-    pos_dict = defaultdict(float)  
+    pos_dict = defaultdict(float) 
+    pos_dict['adjustment'] = 0
     absdiff = 0
     
     # prepare data  
-    text = str(text)
+    text = prepString(removeMarkupWords(text))
     tokenized_text = nltk.word_tokenize(text)
     tag_list = nltk.pos_tag(tokenized_text)
     
@@ -101,18 +123,15 @@ def nltkPOS(text,verbose=False):
 
 
 ### Rhyme
-
-# some basic preprocessing techniques
-def prepString(s):
-    '''removes punctuation other than apostrophes from string'''
-    return str(s).lower().translate({ord(c): None for c in string.punctuation if c not in ("'")})
-
-def removePunc(s):
-    '''removes punctuation from string'''
-    return str(s).lower().translate({ord(c): None for c in string.punctuation})
     
     
 # calculate rhyme density
+# calculate rhyme density.  Hopeful enhancements include:
+# 1) extending rhymeType
+# 2) adding text-to-phoneme and applying for tokens not in CMU dictionary
+# 3) improving the calculation by taking into consideration probability of rhymes
+# 4) removing repeat tokens from consideration to avoid rewarding repeated words
+
 def calcRhymeDensity(text,rhymeType='perfect',rhymeLocation='all',lineStartStop=(1,-2),printExamples=False):
     '''calculates rhyme density (count of rhymes over n-1 words). \n\n
     
@@ -137,20 +156,22 @@ def calcRhymeDensity(text,rhymeType='perfect',rhymeLocation='all',lineStartStop=
     rhyme_cnt = 0
     
     # prepare data
-    text = prepString(text)
+    text = prepString(removeMarkupWords(text))
+    
     if rhymeLocation == 'all':
         words = text.split()
     
     if rhymeLocation == 'end':
         lines = text.split("\n")
-        words = [line.split()[-1] for line in lines]
+        words = [line.split()[-1] for line in lines if len(line.split())>0]
     
     if rhymeLocation == 'section':
         lines = text.split("\n")
-        words = [line.split()[-1] for line in lines[lineStartStop[0]:lineStartStop[1]+1]]
+        words = [line.split()[-1] for line in lines[lineStartStop[0]:lineStartStop[1]+1] if len(line.split())>0]
     
     # 
     wordCount = len(words)
+    #print(words)
     for word in words:
         pros = pronouncing.phones_for_word(word)
         if pros:     
@@ -180,9 +201,9 @@ def calcRhymeDensity(text,rhymeType='perfect',rhymeLocation='all',lineStartStop=
     if printExamples == True:
         print(rhymePart_cnt.most_common(5))
     
-    return rhyme_cnt, wordCount, rhymeDensity
+    return rhymeDensity, rhyme_cnt, wordCount
 
-       
+          
 ### BLEU
 
 def bleu(ref_list,candidateText,nGram=4,nGramType='cumulative',shouldSmooth=True):
@@ -215,8 +236,8 @@ def bleu(ref_list,candidateText,nGram=4,nGramType='cumulative',shouldSmooth=True
                   ,('exclusive',2):(0,1,0,0)
                   ,('exclusive',3):(0,0,1,0)
                   ,('exclusive',4):(0,0,0,1)}
-    candidate = [removePunc(str(candidateText)).split()]
-    references = [[removePunc(str(ref)).split() for ref in ref_list]]
+    candidate = [removePunc(str(removeMarkupWords(candidateText))).split()]
+    references = [[removePunc(str(removeMarkupWords(ref))).split() for ref in ref_list]]
     weights = weight_dict[(nGramType,nGram)]
        
     
@@ -233,7 +254,17 @@ def bleu(ref_list,candidateText,nGram=4,nGramType='cumulative',shouldSmooth=True
 ### Meter
 
 def findLineStress(line):
-    line = prepString(line)
+    '''find accentual stress of a given line, based on CMU dict.  Still a bit unclever.
+    
+    _parameters_
+    line: line of text
+    
+    _returns_
+    parselist: list of potential stresses after parsing. 0 is unstressed, 1 is primary stress, 2 is secondary stress (middle)
+    syllableLengths: list of syllable lengths corresponding to the parses in parselist
+    wordCount: count of words in the line 
+    '''
+    line = prepString(removeMarkupWords(line))
     words = line.split()
     wordCount = len(words)
     parses = ['']
@@ -326,8 +357,9 @@ def findMeter(text):
 
     # initialize
     vote_cnt = Counter()
-    text = prepString(text)
+    text = prepString(removeMarkupWords(text))
     lines = text.split('\n')
+    line_cnt = len(lines)
     minDist = 999
     
     # update distances
@@ -343,8 +375,7 @@ def findMeter(text):
     #options = min(vote_cnt, key=vote_cnt.get)  #chooses one in the event of ties
     lowest = min(vote_cnt.values()) 
     options = [k for k,v in vote_cnt.items() if v==lowest]
-    return lowest, options #, vote_cnt    
-
+    return lowest, options, line_cnt, lowest/float(line_cnt) #, vote_cnt
 
 
 
