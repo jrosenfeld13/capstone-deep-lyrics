@@ -74,8 +74,8 @@
       //expect(instance).to.be();
     });
 
-    it('should have the property duration (base name: "duration")', function() {
-      // uncomment below and update the code to test the property duration
+    it('should have the property durationMs (base name: "duration_ms")', function() {
+      // uncomment below and update the code to test the property durationMs
       //var instane = new LyricsGeneration.LyricsRequest();
       //expect(instance).to.be();
     });
@@ -92,20 +92,8 @@
       //expect(instance).to.be();
     });
 
-    it('should have the property artist (base name: "artist")', function() {
-      // uncomment below and update the code to test the property artist
-      //var instane = new LyricsGeneration.LyricsRequest();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property year (base name: "year")', function() {
-      // uncomment below and update the code to test the property year
-      //var instane = new LyricsGeneration.LyricsRequest();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property tags (base name: "tags")', function() {
-      // uncomment below and update the code to test the property tags
+    it('should have the property genres (base name: "genres")', function() {
+      // uncomment below and update the code to test the property genres
       //var instane = new LyricsGeneration.LyricsRequest();
       //expect(instance).to.be();
     });
