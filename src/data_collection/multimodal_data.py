@@ -84,7 +84,8 @@ class MultimodalRNNLearner():
     """
     pass
 
-def map_weights(learner, pretrained_weights, pretrained_vocab, pretrained_to_multi):
+def map_weights(learner, pretrained_weights, pretrained_vocab, pretrained_to_multi,
+                pre_rnn=True):
     """
     Special case of loading pretrained weights for multimodal model.
     Does the following:
@@ -104,11 +105,18 @@ def map_weights(learner, pretrained_weights, pretrained_vocab, pretrained_to_mul
         wgts[v] = wgts.pop(k)
         
     #3)
-    h1_dim = wgts['multimode.0.module.weight_ih_l0'].shape[0]
-    random_init = torch.randn(h1_dim, learner.model.audio_sz)
-    h1_z1 = torch.cat([wgts['multimode.0.module.weight_ih_l0'],
-                       random_init], dim=1)
-    wgts['multimode.0.module.weight_ih_l0'] = h1_z1
+    if pre_rnn:
+        h1_dim = wgts['multimode.0.module.weight_ih_l0'].shape[0]
+        random_init = torch.randn(h1_dim, learner.model.audio_sz)
+        h1_z1 = torch.cat([wgts['multimode.0.module.weight_ih_l0'],
+                           random_init], dim=1)
+        wgts['multimode.0.module.weight_ih_l0'] = h1_z1
+    else:
+        h_dim = wgts['multidecoder.decoder.weight'].shape[0]
+        random_init = torch.randn(h_dim, learner.model.audio_sz)
+        h_z1 = torch.cat([wgts['multidecoder.decoder.weight'],
+                           random_init], dim=1)
+        wgts['multidecoder.decoder.weight'] = h_z1
     
     #4)
     learner.model.load_state_dict(wgts)
