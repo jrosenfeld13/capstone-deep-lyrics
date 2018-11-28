@@ -15,61 +15,66 @@ class LyricsRequest(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, mode: int=None, danceability: float=None, energy: float=None, duration: float=None, tempo: float=None, title: str=None, artist: str=None, year: int=None, tags: List[str]=None):  # noqa: E501
+    def __init__(self, mode: int=None, key: int=None, time_signature: int=None, danceability: float=None, energy: float=None, duration_ms: float=None, loudness: float=None, tempo: float=None, title: str=None, genres: List[str]=None):  # noqa: E501
         """LyricsRequest - a model defined in Swagger
 
         :param mode: The mode of this LyricsRequest.  # noqa: E501
         :type mode: int
+        :param key: The key of this LyricsRequest.  # noqa: E501
+        :type key: int
+        :param time_signature: The time_signature of this LyricsRequest.  # noqa: E501
+        :type time_signature: int
         :param danceability: The danceability of this LyricsRequest.  # noqa: E501
         :type danceability: float
         :param energy: The energy of this LyricsRequest.  # noqa: E501
         :type energy: float
-        :param duration: The duration of this LyricsRequest.  # noqa: E501
-        :type duration: float
+        :param duration_ms: The duration_ms of this LyricsRequest.  # noqa: E501
+        :type duration_ms: float
+        :param loudness: The loudness of this LyricsRequest.  # noqa: E501
+        :type loudness: float
         :param tempo: The tempo of this LyricsRequest.  # noqa: E501
         :type tempo: float
         :param title: The title of this LyricsRequest.  # noqa: E501
         :type title: str
-        :param artist: The artist of this LyricsRequest.  # noqa: E501
-        :type artist: str
-        :param year: The year of this LyricsRequest.  # noqa: E501
-        :type year: int
-        :param tags: The tags of this LyricsRequest.  # noqa: E501
-        :type tags: List[str]
+        :param genres: The genres of this LyricsRequest.  # noqa: E501
+        :type genres: List[str]
         """
         self.swagger_types = {
             'mode': int,
+            'key': int,
+            'time_signature': int,
             'danceability': float,
             'energy': float,
-            'duration': float,
+            'duration_ms': float,
+            'loudness': float,
             'tempo': float,
             'title': str,
-            'artist': str,
-            'year': int,
-            'tags': List[str]
+            'genres': List[str]
         }
 
         self.attribute_map = {
             'mode': 'mode',
+            'key': 'key',
+            'time_signature': 'time_signature',
             'danceability': 'danceability',
             'energy': 'energy',
-            'duration': 'duration',
+            'duration_ms': 'duration_ms',
+            'loudness': 'loudness',
             'tempo': 'tempo',
             'title': 'title',
-            'artist': 'artist',
-            'year': 'year',
-            'tags': 'tags'
+            'genres': 'genres'
         }
 
         self._mode = mode
+        self._key = key
+        self._time_signature = time_signature
         self._danceability = danceability
         self._energy = energy
-        self._duration = duration
+        self._duration_ms = duration_ms
+        self._loudness = loudness
         self._tempo = tempo
         self._title = title
-        self._artist = artist
-        self._year = year
-        self._tags = tags
+        self._genres = genres
 
     @classmethod
     def from_dict(cls, dikt) -> 'LyricsRequest':
@@ -102,12 +107,50 @@ class LyricsRequest(Model):
         :param mode: The mode of this LyricsRequest.
         :type mode: int
         """
-        if mode is not None and mode > 1:  # noqa: E501
-            raise ValueError("Invalid value for `mode`, must be a value less than or equal to `1`")  # noqa: E501
-        if mode is not None and mode < 0:  # noqa: E501
-            raise ValueError("Invalid value for `mode`, must be a value greater than or equal to `0`")  # noqa: E501
 
         self._mode = mode
+
+    @property
+    def key(self) -> int:
+        """Gets the key of this LyricsRequest.
+
+
+        :return: The key of this LyricsRequest.
+        :rtype: int
+        """
+        return self._key
+
+    @key.setter
+    def key(self, key: int):
+        """Sets the key of this LyricsRequest.
+
+
+        :param key: The key of this LyricsRequest.
+        :type key: int
+        """
+
+        self._key = key
+
+    @property
+    def time_signature(self) -> int:
+        """Gets the time_signature of this LyricsRequest.
+
+
+        :return: The time_signature of this LyricsRequest.
+        :rtype: int
+        """
+        return self._time_signature
+
+    @time_signature.setter
+    def time_signature(self, time_signature: int):
+        """Sets the time_signature of this LyricsRequest.
+
+
+        :param time_signature: The time_signature of this LyricsRequest.
+        :type time_signature: int
+        """
+
+        self._time_signature = time_signature
 
     @property
     def danceability(self) -> float:
@@ -127,10 +170,6 @@ class LyricsRequest(Model):
         :param danceability: The danceability of this LyricsRequest.
         :type danceability: float
         """
-        if danceability is not None and danceability > 1:  # noqa: E501
-            raise ValueError("Invalid value for `danceability`, must be a value less than or equal to `1`")  # noqa: E501
-        if danceability is not None and danceability < 0:  # noqa: E501
-            raise ValueError("Invalid value for `danceability`, must be a value greater than or equal to `0`")  # noqa: E501
 
         self._danceability = danceability
 
@@ -152,35 +191,52 @@ class LyricsRequest(Model):
         :param energy: The energy of this LyricsRequest.
         :type energy: float
         """
-        if energy is not None and energy > 1:  # noqa: E501
-            raise ValueError("Invalid value for `energy`, must be a value less than or equal to `1`")  # noqa: E501
-        if energy is not None and energy < 0:  # noqa: E501
-            raise ValueError("Invalid value for `energy`, must be a value greater than or equal to `0`")  # noqa: E501
 
         self._energy = energy
 
     @property
-    def duration(self) -> float:
-        """Gets the duration of this LyricsRequest.
+    def duration_ms(self) -> float:
+        """Gets the duration_ms of this LyricsRequest.
 
 
-        :return: The duration of this LyricsRequest.
+        :return: The duration_ms of this LyricsRequest.
         :rtype: float
         """
-        return self._duration
+        return self._duration_ms
 
-    @duration.setter
-    def duration(self, duration: float):
-        """Sets the duration of this LyricsRequest.
+    @duration_ms.setter
+    def duration_ms(self, duration_ms: float):
+        """Sets the duration_ms of this LyricsRequest.
 
 
-        :param duration: The duration of this LyricsRequest.
-        :type duration: float
+        :param duration_ms: The duration_ms of this LyricsRequest.
+        :type duration_ms: float
         """
-        if duration is not None and duration < 0:  # noqa: E501
-            raise ValueError("Invalid value for `duration`, must be a value greater than or equal to `0`")  # noqa: E501
+        if duration_ms is not None and duration_ms < 0:  # noqa: E501
+            raise ValueError("Invalid value for `duration_ms`, must be a value greater than or equal to `0`")  # noqa: E501
 
-        self._duration = duration
+        self._duration_ms = duration_ms
+
+    @property
+    def loudness(self) -> float:
+        """Gets the loudness of this LyricsRequest.
+
+
+        :return: The loudness of this LyricsRequest.
+        :rtype: float
+        """
+        return self._loudness
+
+    @loudness.setter
+    def loudness(self, loudness: float):
+        """Sets the loudness of this LyricsRequest.
+
+
+        :param loudness: The loudness of this LyricsRequest.
+        :type loudness: float
+        """
+
+        self._loudness = loudness
 
     @property
     def tempo(self) -> float:
@@ -229,74 +285,24 @@ class LyricsRequest(Model):
         self._title = title
 
     @property
-    def artist(self) -> str:
-        """Gets the artist of this LyricsRequest.
+    def genres(self) -> List[str]:
+        """Gets the genres of this LyricsRequest.
 
-        Name of the artist.  # noqa: E501
+        comma-separated list of genres  # noqa: E501
 
-        :return: The artist of this LyricsRequest.
-        :rtype: str
-        """
-        return self._artist
-
-    @artist.setter
-    def artist(self, artist: str):
-        """Sets the artist of this LyricsRequest.
-
-        Name of the artist.  # noqa: E501
-
-        :param artist: The artist of this LyricsRequest.
-        :type artist: str
-        """
-
-        self._artist = artist
-
-    @property
-    def year(self) -> int:
-        """Gets the year of this LyricsRequest.
-
-        Year in which song was composed  # noqa: E501
-
-        :return: The year of this LyricsRequest.
-        :rtype: int
-        """
-        return self._year
-
-    @year.setter
-    def year(self, year: int):
-        """Sets the year of this LyricsRequest.
-
-        Year in which song was composed  # noqa: E501
-
-        :param year: The year of this LyricsRequest.
-        :type year: int
-        """
-        if year is not None and year > 2019:  # noqa: E501
-            raise ValueError("Invalid value for `year`, must be a value less than or equal to `2019`")  # noqa: E501
-        if year is not None and year < 1300:  # noqa: E501
-            raise ValueError("Invalid value for `year`, must be a value greater than or equal to `1300`")  # noqa: E501
-
-        self._year = year
-
-    @property
-    def tags(self) -> List[str]:
-        """Gets the tags of this LyricsRequest.
-
-        Tags to be used as seed words for lyric generation.  # noqa: E501
-
-        :return: The tags of this LyricsRequest.
+        :return: The genres of this LyricsRequest.
         :rtype: List[str]
         """
-        return self._tags
+        return self._genres
 
-    @tags.setter
-    def tags(self, tags: List[str]):
-        """Sets the tags of this LyricsRequest.
+    @genres.setter
+    def genres(self, genres: List[str]):
+        """Sets the genres of this LyricsRequest.
 
-        Tags to be used as seed words for lyric generation.  # noqa: E501
+        comma-separated list of genres  # noqa: E501
 
-        :param tags: The tags of this LyricsRequest.
-        :type tags: List[str]
+        :param genres: The genres of this LyricsRequest.
+        :type genres: List[str]
         """
 
-        self._tags = tags
+        self._genres = genres
