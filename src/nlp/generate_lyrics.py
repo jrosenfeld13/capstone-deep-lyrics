@@ -24,25 +24,18 @@ class DeepLyric:
     
         """
         self.model = model
-        self.weights = model_weights
+        self.weights = weights
         self.itos = itos
         self.stoi = {v:k for k,v in enumerate(self.itos)}
         self.model_type = model_type
                 
-    def get_word_from_index(self, idx):
-        """
-        Converts word integer to string
-        
-        Parameters:
-        -----------
-        idx : int
-        
-        Returns:
-        ----------
-        word : str
-        """
-        word = self.stoi[idx]
-        return word
+    def numericalize(self, t):
+        "Convert a list of tokens `t` to their ids."
+        return [self.stoi[w] for w in t]
+
+    def textify(self, nums:Collection[int], sep=' '):
+        "Convert a list of `nums` to their tokens."
+        return sep.join([self.itos[i] for i in nums])
         
     def save_lyrics_to_file(self, dir):
         """
@@ -52,13 +45,13 @@ class DeepLyric:
             for word in self.best_song:
                 f.write(word)
 
-    def print_lyrics(self):
+    def print_lyrics(self, context):
         """
         Directly print lyrics to standard output
         """
-        for i in range(len(self.best_song)):
-            
-            word = self.itos.index(word[i])  #data_lm.valid_ds.vocab.textify([step])
+        for i in range(len(context)):
+            step = context[i]
+            word = self.textify([step])
 
             if word == 'xeol':
                 word = '\n'
@@ -69,92 +62,7 @@ class DeepLyric:
                 break
                 
             print(word, end=' ')  
-        
-    def generate_text(self, seed_text=['xbos'], max_len=100, GPU=False, context_length=30, beam_width=5, verbose=True, temperature=1, top_k=15):
-        """
-        Primary function used to compose lyrics for a song
-        
-        Parameters
-        ----------
-        seed_text : list or str
-            List of strings where each item is a token. (e.g. ['the', 'cat']) or string that is split on white space
-
-        max_len : int
-            Number of words in generated sequence
-            
-        gpu : bool
-            If you're using a GPU or not...
-        
-        context_length : int
-            Amount of words that get input as "context" into the model. Set to 0 for no limit
-            
-        beam_width : int
-            How many new word indices to try out...computationally expensive
-        
-        verbose : bool
-            If True, prints every possible context for a given word cycle
-        
-        temperature : float
-            Hyperparameter for adjusting the predicted probabilities by scaling the logits prior to softmax
-        
-        
-        Returns
-        -------
-        self._context_and_scores : list of lists
-            Returns a sorted list of the entire tree search of contexts and their respective scores in the form:
-            [[context, score], [context, score], ..., [context, score]]
-        
-                
-        """
-        if isinstance(seed_text, str):
-            seed_text = [get_word_from_index(idx) for idx in seed_text.split(' ')]
-            
-        # Width for the beam search, to be externalized along with general decoding
-        beam_width = beam_width
-        
-        # List of candidate word sequence. We'll maintain #beam_width top sequences here.
-        # The context is a list of words, the scores are the sum of the log probabilities of each word
-        self._context_and_scores = [[seed_text, 0.0]]
-        
-        # Loop over max number of words
-        for word_number in range(max_len):
-            if verbose: print(f'Generating word: {word_number+1} / {max_len}')
-
-            candidates = []
-            
-            # For each possible context that we've generated so far, generate new probabilities, 
-            # and pick an additional #beam_width next candidates
-            for i in range(len(self._context_and_scores)):
-                # Get a new sequence of word indices and log-probability
-                # Example: [[2, 138, 661], 23.181717]
-                context, score = self._context_and_scores[i]
-                
-                # Obtain probabilities for next word given the context 
-                probabilities = get_text_distribution(context, context_length, temperature)
-
-                # Multinomial draw from the probabilities
-                multinom_draw = np.random.multinomial(beam_width, probabilities)
-                top_probabilities = np.argwhere(multinom_draw != 0).flatten()
-                            
-                # For each possible new candidate, update the context and scores
-                for j in range(len(top_probabilities)):
-                    next_word_idx = top_probabilities[j]
-                    new_context = context + [next_word_idx]
-                    candidate = [new_context, (score - np.log(probabilities[next_word_idx]))]
-                    candidates.append(candidate)
-            
-            # Update the running tally of context and scores and sort by probability of each entry
-            self._context_and_scores = candidates
-            self._context_and_scores = sorted(self._context_and_scores, key = lambda x: x[1]) #sort by top entries
-
-            self._context_and_scores = self._context_and_scores[:top_k] #for now, only keep the top 15 to speed things up but we can/should change this to beam_width or something else
-            self.best_song, self.best_score = self._context_and_scores[0]
-
-            if verbose:
-                for context, score in self._context_and_scores:
-                    print_lyrics(context)
-                    print('\n')
-                    
+   
     def get_text_distribution(self, context, context_length, temperature):
         """
         Produces predicted probabiltiies for the next word
@@ -197,4 +105,84 @@ class DeepLyric:
         probabilities = F.softmax(result/temperature, dim=0)
         probabilities = np.asarray(probabilities.detach().cpu(), dtype=np.float)
         probabilities /= np.sum(probabilities) 
-        return probabilities
+        return probabilities            
+    
+    def generate_text(self, seed_text='xbos', max_len=100, GPU=False, context_length=30, beam_width=5, verbose=True, temperature=1, top_k=15):
+        """
+        Primary function used to compose lyrics for a song
+        
+        Parameters
+        ----------
+        seed_text : list or str
+            List of strings where each item is a token. (e.g. ['the', 'cat']) or string that is split on white space
+
+        max_len : int
+            Number of words in generated sequence
+            
+        gpu : bool
+            If you're using a GPU or not...
+        
+        context_length : int
+            Amount of words that get input as "context" into the model. Set to 0 for no limit
+            
+        beam_width : int
+            How many new word indices to try out...computationally expensive
+        
+        verbose : bool
+            If True, prints every possible context for a given word cycle
+        
+        temperature : float
+            Hyperparameter for adjusting the predicted probabilities by scaling the logits prior to softmax
+          
+        Returns
+        -------
+        self._context_and_scores : list of lists
+            Returns a sorted list of the entire tree search of contexts and their respective scores in the form:
+            [[context, score], [context, score], ..., [context, score]]
+        """
+        if isinstance(seed_text, str):
+            seed_text = seed_text.split(' ')
+        
+        seed_text = self.numericalize(seed_text)
+        
+        # List of candidate word sequence. We'll maintain #beam_width top sequences here.
+        # The context is a list of words, the scores are the sum of the log probabilities of each word
+        self._context_and_scores = [[seed_text, 0.0]]
+        
+        # Loop over max number of words
+        for word_number in range(max_len):
+            if verbose: print(f'Generating word: {word_number+1} / {max_len}')
+
+            candidates = []
+            
+            # For each possible context that we've generated so far, generate new probabilities, 
+            # and pick an additional #beam_width next candidates
+            for i in range(len(self._context_and_scores)):
+                # Get a new sequence of word indices and log-probability
+                # Example: [[2, 138, 661], 23.181717]
+                context, score = self._context_and_scores[i]
+                # Obtain probabilities for next word given the context 
+                probabilities = self.get_text_distribution(context, context_length, temperature)
+
+                # Multinomial draw from the probabilities
+                multinom_draw = np.random.multinomial(beam_width, probabilities)
+                top_probabilities = np.argwhere(multinom_draw != 0).flatten()
+                            
+                # For each possible new candidate, update the context and scores
+                for j in range(len(top_probabilities)):
+                    next_word_idx = top_probabilities[j]
+                    new_context = context + [next_word_idx]
+                    candidate = [new_context, (score - np.log(probabilities[next_word_idx]))]
+                    candidates.append(candidate)
+            
+            # Update the running tally of context and scores and sort by probability of each entry
+            self._context_and_scores = candidates
+            self._context_and_scores = sorted(self._context_and_scores, key = lambda x: x[1]) #sort by top entries
+
+            self._context_and_scores = self._context_and_scores[:top_k] #for now, only keep the top 15 to speed things up but we can/should change this to beam_width or something else
+            self.best_song, self.best_score = self._context_and_scores[0]
+
+            if verbose:
+                for context, score in self._context_and_scores:
+                    self.print_lyrics(context)
+                    print('\n')
