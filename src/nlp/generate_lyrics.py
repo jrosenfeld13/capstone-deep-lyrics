@@ -1,3 +1,5 @@
+import nltk.tokenize
+
 class DeepLyric:
     """
     Generate deep lyrics given model and weights
@@ -36,14 +38,24 @@ class DeepLyric:
     def textify(self, nums:Collection[int], sep=' '):
         "Convert a list of `nums` to their tokens."
         return sep.join([self.itos[i] for i in nums])
-        
+    
+    def tokenize(self, context):
+        tk = nltk.tokenize.LineTokenizer(blanklines='keep')
+        context = tk.tokenize(context)
+
+        re_tk = nltk.tokenize.RegexpTokenizer(r'\[[^\]]+\]|\w+|[\d\.,]+|\S+',
+                                              discard_empty=False)
+        context = re_tk.tokenize_sents(context)[0]
+        return context
+    
     def save_lyrics_to_file(self, dir):
         """
         Saves lyrics to specified `dir`
         """
-        with open(f"{dir}", "wb") as f:
-            for word in self.best_song:
-                f.write(word)
+        with open(f"{dir}", "w") as f:
+            lyrics = [f'{word}\n' if self.textify([word]) == 'xeol' else word
+                   for word in self.textify(self.best_song)]
+            f.write(''.join(lyrics))
 
     def print_lyrics(self, context):
         """
@@ -56,7 +68,7 @@ class DeepLyric:
             if word == 'xeol':
                 word = '\n'
             elif 'xbol' in word:
-                word = word
+                continue
             elif word == 'xeos': 
                 print(word)
                 break
@@ -141,7 +153,7 @@ class DeepLyric:
             [[context, score], [context, score], ..., [context, score]]
         """
         if isinstance(seed_text, str):
-            seed_text = seed_text.split(' ')
+            seed_text = self.tokenize(seed_text)
         
         seed_text = self.numericalize(seed_text)
         
