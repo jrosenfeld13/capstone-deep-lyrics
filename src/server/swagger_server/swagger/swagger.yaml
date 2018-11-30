@@ -49,48 +49,41 @@ definitions:
         type: "integer"
         format: "int32"
         description: "Song mode. 0 if minor, 1 if major."
-        minimum: 0
-        maximum: 1
+      key:
+        type: "integer"
+      time_signature:
+        type: "integer"
       danceability:
         type: "number"
-        minimum: 0
-        maximum: 1
       energy:
         type: "number"
-        minimum: 0
-        maximum: 1
-      duration:
+      duration_ms:
         type: "number"
         minimum: 0
+      loudness:
+        type: "number"
       tempo:
         type: "number"
         minimum: 0
       title:
         type: "string"
         description: "Song title."
-      artist:
-        type: "string"
-        description: "Name of the artist."
-      year:
-        type: "integer"
-        format: "int32"
-        description: "Year in which song was composed"
-        minimum: 1300
-        maximum: 2019
-      tags:
+      genres:
         type: "array"
-        description: "Tags to be used as seed words for lyric generation."
+        description: "comma-separated list of genres"
         items:
           type: "string"
     example:
       mode: 0
-      duration: 0.59621339166831821554382031536079011857509613037109375
-      artist: "artist"
+      duration_ms: 0.59621339166831821554382031536079011857509613037109375
       year: 1465
       tempo: 0.5637376656633328320111786524648778140544891357421875
       title: "title"
       danceability: 0.602745618307040320615897144307382404804229736328125
       energy: 0.146581298050294517310021547018550336360931396484375
+      genres:
+      - "folk"
+      - "gipsy"
       tags:
       - "tags"
       - "tags"

@@ -1,0 +1,1 @@
+var LyricsGeneration = require('lyrics_generation');

@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
 <link rel="stylesheet" href="styles.css">
 <script type="text/javascript" src="bundle.js" ></script>
+<script type="text/javascript" src="node_modules/fetch/lib/fetch.js" ></script>
 <style>
 body,h1,h2,h3,h4,h5 {font-family: "Poppins", sans-serif}
 body {font-size:16px;}
@@ -62,18 +63,25 @@ body {font-size:16px;}
   <div class="w3-container" id="try" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Try it out</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>Do you want to try our lyrics generator? Customize your lyrics below and we'll create the best lyrics for your song!</p>
-    <form action="javascript:generateLyrics()">
+    <p>Do you want to try our lyrics generator? Login to Spotify to choose a song and we'll generate lyrics from it, or generate a random lyric and we'll choose a song for you and show you how poetic deep learning can be!</p>
+
+    <!-- <form action="javascript:()"> -->
       <div class="w3-section">
-        <label>Song name</label>
-        <input class="w3-input w3-border" type="text" name="SongName">
+        <label>Song or artist search terms</label>
+        <input class="w3-input w3-border" type="text" id="search_term" />
       </div>
-      <div class="w3-section">
+      <!-- <div class="w3-section">
         <label>Tags</label>
         <input class="w3-input w3-border" type="text" name="Tags" >
-      </div>
-      <button type="submit" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Generate lyrics</button>
-    </form>
+      </div> -->
+    <button type="button" onclick="javascript:generateRandomLyrics()" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Generate random lyrics</button>
+    <button type="button" onclick="javascript:searchSongs()" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Search</button>
+    <!-- </form> -->
+
+    <!-- Song display -->
+
+    <div id="song_search_results" class="w3-row-padding w3-grayscale">
+    </div>  
 
     <!-- Lyrics display-->
     <div id="lyrics_div" class="m4 w3-margin-bottom" style="display:none" >
@@ -145,25 +153,118 @@ body {font-size:16px;}
 
 <script>
 
+
+/*
+* Spotify API 
+*/
+
+function getAccessTokenFromUrl() {
+    var hashParams = {};
+    var e, r = /([^&;=]+)=?([^&;]*)/g,
+        q = window.location.hash.substring(1);
+    while ( e = r.exec(q)) {
+        hashParams[e[1]] = decodeURIComponent(e[2]);
+    }
+    return hashParams.access_token;
+  }
+
+function searchSongs() {
+
+    const term = document.getElementById("search_term").value;
+    const accessToken = getAccessTokenFromUrl();
+
+    if(!accessToken) {
+        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://localhost:8888/&response_type=token&state=123');
+    } else {
+        fetch(`https://api.spotify.com/v1/search?q=${term}&type=track&limit=20`, { 
+            method: 'GET', 
+            headers: new Headers({
+              'Authorization': 'Bearer ' + accessToken
+            })
+        }).then(response => {
+            return response.json();
+        }).then(json => {
+            
+            const tracks = json.tracks.items;
+
+            document.getElementById("song_search_results").innerHTML = "";
+            let html = "";
+
+            for (let i in tracks) {
+              const track = tracks[i];
+
+              html += "<div class=\"w3-col m4 w3-margin-bottom\">";
+              html += "<div class=\"w3-light-grey\">"
+              html += "<div class=\"w3-container\">";
+              html += `<h3>${track.artists[0].name}: ${track.name}</h3>`;
+              html += `<img src="${track.album.images[0].url}"  style="width:100%"/>`;
+              html +=  `<button type="button" id="${track.id}" onclick="javascript:generateLyricsForSong('${track.id}', '${track.name}', ['gipsy', 'jazz'])" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Generate lyrics</button>`;
+              html += `<button type="button" onClick="window.open('${track.external_urls['spotify']}');" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Listen in Spotify</button>`;
+              html += `</div></div></div>`
+            }
+            document.getElementById("song_search_results").innerHTML = html;
+        }).catch(err => {
+            alert("Error:" + err);
+        });
+    }
+}
+
+/*
+* Lyrics generation
+*/
+
+function generateRandomLyrics() {
+  alert("generateRandomLyrics not implemented yet!");
+}
+
+function generateLyricsForSong(trackId, title, genres) {
+  const accessToken = getAccessTokenFromUrl();
+  if(!accessToken) {
+        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://localhost:8888/&response_type=token&state=123');
+    } else {
+        fetch(`https://api.spotify.com/v1/audio-features?ids=${trackId}`, { 
+            method: 'GET', 
+            headers: new Headers({
+              'Authorization': 'Bearer ' + accessToken
+            })
+        }).then(response => {
+            return response.json();
+        }).then(json => {
+          const features = json.audio_features[0]
+          const url = 'http://localhost:8080'
+          fetch(`${url}/lyrics`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                mode: features.mode,
+                energy: features.energy,
+                key: features.key,
+                loudness: features.loudness,
+                duration_ms: features.duration_ms,
+                tempo: features.tempo,
+                title: title,
+                genres: genres,
+                time_signature: features.time_signature
+            })
+          }).then(function(response) {
+              return response.text();
+          }).then(function(text) {
+              //document.getElementById("song_search_results").innerHTML = "";
+              showLyrics(text);
+              
+          }).catch(function(ex) {
+            alert(`response failed ${ex}`);
+          });
+        });
+    }
+}
+
+
 // Handle lyric generation request
 function generateLyrics() {
 
-    const url = 'http://localhost:8080'
-    fetch(`${url}/lyrics`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-      })
-      
-    }).then(function(response) {
-        return response.text();
-    }).then(function(text) {
-        showLyrics(text);
-    }).catch(function(ex) {
-      alert(`response failed ${ex}`);
-    });
 }
 
 // Script to open and close sidebar

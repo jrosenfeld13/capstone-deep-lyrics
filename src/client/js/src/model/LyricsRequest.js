@@ -54,8 +54,6 @@
 
 
 
-
-
   };
 
   /**
@@ -78,8 +76,8 @@
       if (data.hasOwnProperty('energy')) {
         obj['energy'] = ApiClient.convertToType(data['energy'], 'Number');
       }
-      if (data.hasOwnProperty('duration')) {
-        obj['duration'] = ApiClient.convertToType(data['duration'], 'Number');
+      if (data.hasOwnProperty('duration_ms')) {
+        obj['duration_ms'] = ApiClient.convertToType(data['duration_ms'], 'Number');
       }
       if (data.hasOwnProperty('tempo')) {
         obj['tempo'] = ApiClient.convertToType(data['tempo'], 'Number');
@@ -87,14 +85,8 @@
       if (data.hasOwnProperty('title')) {
         obj['title'] = ApiClient.convertToType(data['title'], 'String');
       }
-      if (data.hasOwnProperty('artist')) {
-        obj['artist'] = ApiClient.convertToType(data['artist'], 'String');
-      }
-      if (data.hasOwnProperty('year')) {
-        obj['year'] = ApiClient.convertToType(data['year'], 'Number');
-      }
-      if (data.hasOwnProperty('tags')) {
-        obj['tags'] = ApiClient.convertToType(data['tags'], ['String']);
+      if (data.hasOwnProperty('genres')) {
+        obj['genres'] = ApiClient.convertToType(data['genres'], ['String']);
       }
     }
     return obj;
@@ -114,9 +106,9 @@
    */
   exports.prototype['energy'] = undefined;
   /**
-   * @member {Number} duration
+   * @member {Number} duration_ms
    */
-  exports.prototype['duration'] = undefined;
+  exports.prototype['duration_ms'] = undefined;
   /**
    * @member {Number} tempo
    */
@@ -127,20 +119,10 @@
    */
   exports.prototype['title'] = undefined;
   /**
-   * Name of the artist.
-   * @member {String} artist
+   * comma-separated list of genres
+   * @member {Array.<String>} genres
    */
-  exports.prototype['artist'] = undefined;
-  /**
-   * Year in which song was composed
-   * @member {Number} year
-   */
-  exports.prototype['year'] = undefined;
-  /**
-   * Tags to be used as seed words for lyric generation.
-   * @member {Array.<String>} tags
-   */
-  exports.prototype['tags'] = undefined;
+  exports.prototype['genres'] = undefined;
 
 
 
