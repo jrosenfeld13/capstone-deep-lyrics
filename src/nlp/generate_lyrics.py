@@ -1,10 +1,16 @@
+import numpy as np
 import nltk.tokenize
+from fastai import *
+from fastai.text import *
+
+from copy import copy, deepcopy
+from enum import Enum
 
 class DeepLyric:
     """
     Generate deep lyrics given model and weights
     """
-    def __init__(self, model, weights, itos):
+    def __init__(self, model, weights, itos, model_type='language'):
         """
         Parameters:
         -----------
@@ -15,7 +21,7 @@ class DeepLyric:
         weights : filepath or url for .pth weight file.
             Weights for corresponding `model`
             
-        itos : nparray
+        itos : nparray or list
             Language model int to string lookup
             
         model_type : str
@@ -23,23 +29,25 @@ class DeepLyric:
             - 'language' : pure language model
             - 'pre-multi' : multimodal model prior to RNN layers
             - 'post-multi' : multimodal model after RNN layers
-    
         """
         self.model = model
         self.weights = weights
         self.itos = itos
         self.stoi = {v:k for k,v in enumerate(self.itos)}
         self.model_type = model_type
-                
+        
+        ###need to build framework to attach weights to a PyTorch/FastAI model object
+        
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
         return [self.stoi[w] for w in t]
 
-    def textify(self, nums:Collection[int], sep=' '):
+    def textify(self, nums, sep=' '):
         "Convert a list of `nums` to their tokens."
         return sep.join([self.itos[i] for i in nums])
     
     def tokenize(self, context):
+        "Properly tokenize a string of words"
         tk = nltk.tokenize.LineTokenizer(blanklines='keep')
         context = tk.tokenize(context)
 
@@ -57,10 +65,17 @@ class DeepLyric:
                    for word in self.textify(self.best_song)]
             f.write(''.join(lyrics))
 
-    def print_lyrics(self, context):
+    def print_lyrics(self, context=[]):
         """
         Directly print lyrics to standard output
+        
+        Parameters:
+        -----------
+        context : list or nparray of word indices
         """
+        if not context:
+            context = self.best_song
+        
         for i in range(len(context)):
             step = context[i]
             word = self.textify([step])
@@ -75,7 +90,7 @@ class DeepLyric:
                 
             print(word, end=' ')  
    
-    def get_text_distribution(self, context, context_length, temperature):
+    def get_text_distribution(self, context, context_length, temperature, GPU, audio):
         """
         Produces predicted probabiltiies for the next word
               
@@ -89,6 +104,9 @@ class DeepLyric:
             
         temperature : float
             Hyperparameter for adjusting the predicted probabilities by scaling the logits prior to softmax
+    
+        audio : ??
+            
 
         Returns:
         ----------
@@ -105,7 +123,21 @@ class DeepLyric:
         self.model.eval()
 
         # forward pass the "context" into the model
-        result, *_ = self.model(context)
+        if self.model_type == 'language':
+            result, *_ = self.model(context)
+        
+        elif self.model_type == 'pre-multi' or self.model_type == 'post-multi':
+            audio_size = len(audio) ###FIX THIS!!!
+            
+            if audio is None:
+                audio_features = Tensor([0]*audio_size*len(context)).view(-1, 1, audio_size).cuda()
+            else:
+                audio_features = np.tile(audio, len(context))
+                audio_features = Tensor(audio_features).view(-1, 1, len(audio)).cuda()
+            
+            result, *_ = self.model(context, audio_features)
+        
+        
         result = result[-1]
 
         # set unk and pad to 0 prob
@@ -119,7 +151,7 @@ class DeepLyric:
         probabilities /= np.sum(probabilities) 
         return probabilities            
     
-    def generate_text(self, seed_text='xbos', max_len=100, GPU=False, context_length=30, beam_width=5, verbose=True, temperature=1, top_k=15):
+    def generate_text(self, seed_text='xbos', max_len=40, GPU=False, context_length=30, beam_width=3, verbose=1, temperature=1.5, top_k=3, audio=None):
         """
         Primary function used to compose lyrics for a song
         
@@ -140,12 +172,19 @@ class DeepLyric:
         beam_width : int
             How many new word indices to try out...computationally expensive
         
-        verbose : bool
-            If True, prints every possible context for a given word cycle
+        verbose : int
+            0: Print nothing to console
+            1: Print currently generated word number to console
+            2: Print currently generated word number and all currently considered song options to console 
         
         temperature : float
             Hyperparameter for adjusting the predicted probabilities by scaling the logits prior to softmax
           
+        top_k : int
+            Number of song options to keep over each loop. This should normally be set to beam_width
+        
+        audio : ??
+        
         Returns
         -------
         self._context_and_scores : list of lists
@@ -163,7 +202,7 @@ class DeepLyric:
         
         # Loop over max number of words
         for word_number in range(max_len):
-            if verbose: print(f'Generating word: {word_number+1} / {max_len}')
+            if verbose==1 or verbose==2: print(f'Generating word: {word_number+1} / {max_len}')
 
             candidates = []
             
@@ -174,7 +213,7 @@ class DeepLyric:
                 # Example: [[2, 138, 661], 23.181717]
                 context, score = self._context_and_scores[i]
                 # Obtain probabilities for next word given the context 
-                probabilities = self.get_text_distribution(context, context_length, temperature)
+                probabilities = self.get_text_distribution(context, context_length, temperature, GPU, audio)
 
                 # Multinomial draw from the probabilities
                 multinom_draw = np.random.multinomial(beam_width, probabilities)
@@ -194,7 +233,7 @@ class DeepLyric:
             self._context_and_scores = self._context_and_scores[:top_k] #for now, only keep the top 15 to speed things up but we can/should change this to beam_width or something else
             self.best_song, self.best_score = self._context_and_scores[0]
 
-            if verbose:
+            if verbose==2:
                 for context, score in self._context_and_scores:
                     self.print_lyrics(context)
                     print('\n')
