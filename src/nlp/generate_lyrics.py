@@ -53,7 +53,7 @@ class DeepLyric:
         Saves lyrics to specified `dir`
         """
         with open(f"{dir}", "w") as f:
-            lyrics = [f'{word}\n' if self.textify([word]) == 'xeol' else word
+            lyrics = [f'{word}\n' if word == 'xeol' else word
                    for word in self.textify(self.best_song)]
             f.write(''.join(lyrics))
 
