@@ -10,7 +10,7 @@ class DeepLyric:
     """
     Generate deep lyrics given model and weights
     """
-    def __init__(self, model, weights, itos, model_type='language'):
+    def __init__(self, model, itos, weights=None, model_type='language'):
         """
         Parameters:
         -----------
@@ -88,11 +88,13 @@ class DeepLyric:
             elif 'xbol' in word:
                 continue
             elif word =='xbos':
-                word = 'xbos\n'
+                word = 'SONG START\n'
             elif word == 'xtitle':
-                word ='\n xtitle'
+                word ='\n title:'
+            elif word == 'xgenre':
+                word ='genre:'
             elif word == 'xeos': 
-                print(word)
+                print('SONG END')
                 break
                 
             print(word, end=' ')  
