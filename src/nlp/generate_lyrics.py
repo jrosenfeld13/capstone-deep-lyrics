@@ -27,8 +27,8 @@ class DeepLyric:
         model_type : str
             Indicates if model is one of the following
             - 'language' : pure language model
-            - 'pre-multi' : multimodal model prior to RNN layers
-            - 'post-multi' : multimodal model after RNN layers
+            - 'multimodal' : multimodal model; pre/post architecture is defined
+                by `model`
         """
         self.model = model
         self.weights = weights
@@ -93,11 +93,11 @@ class DeepLyric:
                 word ='\n title:'
             elif word == 'xgenre':
                 word ='genre:'
-            elif word == 'xeos': 
+            elif word == 'xeos':
                 print('SONG END')
                 break
                 
-            print(word, end=' ')  
+            print(word, end=' ')
    
     def get_text_distribution(self, context, context_length, temperature, GPU, audio):
         """
@@ -112,15 +112,18 @@ class DeepLyric:
             `context`[-context_length:]
             
         temperature : float
-            Hyperparameter for adjusting the predicted probabilities by scaling the logits prior to softmax
+            Hyperparameter for adjusting the predicted probabilities by scaling
+            the logits prior to softmax
     
-        audio : ??
+        audio : 2darray - 1 x n
+            audio features for a song. `n` should equal the size of the
+            multimodal features in `model`
             
 
         Returns:
         ----------
         List of probabilities with length of vocab size
-        """        
+        """
         if GPU:
             context = LongTensor(context[-context_length:]).view(-1,1).cuda()
         else:
@@ -135,14 +138,16 @@ class DeepLyric:
         if self.model_type == 'language':
             result, *_ = self.model(context)
         
-        elif self.model_type == 'pre-multi' or self.model_type == 'post-multi':
-            audio_size = len(audio) ###FIX THIS!!!
+        elif self.model_type == 'multimodal':
+            audio_size = len(audio)
             
             if audio is None:
-                audio_features = Tensor([0]*audio_size*len(context)).view(-1, 1, audio_size).cuda()
+                audio_features = Tensor([0]*audio_size*len(context))\
+                    .view(-1, 1, audio_size).cuda()
             else:
                 audio_features = np.tile(audio, len(context))
-                audio_features = Tensor(audio_features).view(-1, 1, len(audio)).cuda()
+                audio_features = Tensor(audio_features)\
+                    .view(-1, 1, audio_size).cuda()
             
             result, *_ = self.model(context, audio_features)
         
@@ -157,10 +162,12 @@ class DeepLyric:
         # softmax and normalize
         probabilities = F.softmax(result/temperature, dim=0)
         probabilities = np.asarray(probabilities.detach().cpu(), dtype=np.float)
-        probabilities /= np.sum(probabilities) 
-        return probabilities            
+        probabilities /= np.sum(probabilities)
+        return probabilities
     
-    def generate_text(self, seed_text='xbos', max_len=40, GPU=False, context_length=30, beam_width=3, verbose=1, temperature=1.5, top_k=3, audio=None):
+    def generate_text(self, seed_text='xbos', max_len=40, GPU=False,
+                      context_length=30, beam_width=3, verbose=1,
+                      temperature=1.5, top_k=3, audio=None):
         """
         Primary function used to compose lyrics for a song
         
@@ -184,7 +191,7 @@ class DeepLyric:
         verbose : int
             0: Print nothing to console
             1: Print currently generated word number to console
-            2: Print currently generated word number and all currently considered song options to console 
+            2: Print currently generated word number and all currently considered song options to console
         
         temperature : float
             Hyperparameter for adjusting the predicted probabilities by scaling the logits prior to softmax
@@ -215,13 +222,13 @@ class DeepLyric:
 
             candidates = []
             
-            # For each possible context that we've generated so far, generate new probabilities, 
+            # For each possible context that we've generated so far, generate new probabilities,
             # and pick an additional #beam_width next candidates
             for i in range(len(self._context_and_scores)):
                 # Get a new sequence of word indices and log-probability
                 # Example: [[2, 138, 661], 23.181717]
                 context, score = self._context_and_scores[i]
-                # Obtain probabilities for next word given the context 
+                # Obtain probabilities for next word given the context
                 probabilities = self.get_text_distribution(context, context_length, temperature, GPU, audio)
 
                 # Multinomial draw from the probabilities
