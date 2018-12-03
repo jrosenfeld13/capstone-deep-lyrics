@@ -139,7 +139,8 @@ class DeepLyric:
             result, *_ = self.model(context)
         
         elif self.model_type == 'multimodal':
-            audio_size = len(audio)
+            assert len(audio.shape) == 2,"audio features must be a 1xn array"
+            audio_size = audio.shape[1]
             
             if audio is None:
                 audio_features = Tensor([0]*audio_size*len(context))\
