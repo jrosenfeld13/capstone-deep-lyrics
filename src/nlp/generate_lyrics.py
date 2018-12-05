@@ -70,7 +70,7 @@ class DeepLyric:
         try:
             return self.config[key]
         except KeyError:
-            raise, f"Missing one or more required parameter: {key}"
+            raise KeyError(f"Missing one or more required parameter: {key}")
     
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
