@@ -6,38 +6,132 @@ from fastai.text import *
 from copy import copy, deepcopy
 from enum import Enum
 
+from datetime import datetime
+import json
+import requests
+
+def get_model(model_name):
+    """
+    Retrieve model from google cloud storage
+    """
+    model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture.pkl'
+    model = requests.get(model_url)
+    model = model.content
+    model = pickle.loads(model)
+    return model
+
+def get_itos(model_name):
+    """
+    Retrieve itos from google cloud storage
+    """
+    itos_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_itos.pkl'
+    itos = requests.get(itos_url)
+    itos = itos.content
+    itos = pickle.loads(itos)
+    return itos
+
 class DeepLyric:
     """
     Generate deep lyrics given model and weights
     """
-    def __init__(self, model, itos, weights=None, model_type='language'):
+    DEFAULT_CONFIG = {
+        'seed_text': 'xbos',
+        'max_len': 40,
+        'GPU': True,
+        'context_length': 30,
+        'beam_width': 3,
+        'verbose': 0,
+        'temperature': 1.5,
+        'top_k': 3,
+        'audio': None,
+        'multinomial': True
+    }
+    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None):
         """
         Parameters:
         -----------
-        model : PyTorch model or FastAI model abstraction
+        model : str or PyTorch model or FastAI model abstraction
             Model object from PyTorch or FastAI.
             Provides model architecture and forward pass
         
         weights : filepath or url for .pth weight file.
             Weights for corresponding `model`
+            *Currently Not Implemented*
             
         itos : nparray or list
             Language model int to string lookup
+            Only required if Torch model is directly loaded to `model`
             
         model_type : str
             Indicates if model is one of the following
             - 'language' : pure language model
             - 'multimodal' : multimodal model; pre/post architecture is defined
                 by `model`
+                
+        model_name : str
+            Optional model name if Torch model is directly loaded to `model`
+            If None the model name will be missing in the metadata output
         """
-        self.model = model
-        self.weights = weights
-        self.itos = itos
-        self.stoi = {v:k for k,v in enumerate(self.itos)}
+        # initialize config dictionary to default
+        self.set_config(config_dict=self.DEFAULT_CONFIG)
+        self.set_config('model_name', model_name)
         self.model_type = model_type
+        self.set_config('model_type', model_type)
         
-        ###need to build framework to attach weights to a PyTorch/FastAI model object
+        if isinstance(model, str):
+            self.set_config('model_name', model)
+            self.model = get_model(model)
+            self.itos = get_itos(model)
+        else:
+            self.model = model
+            self.itos = itos
         
+        self.stoi = {v:k for k,v in enumerate(self.itos)}
+        
+    
+    @property
+    def config(self):
+        return self._config
+        
+    def get_config(self, key):
+        try:
+            return self.config[key]
+        except KeyError:
+            raise KeyError(f"Missing one or more required parameter: {key}")
+        
+    def set_config(self, key=None, value=None, config_dict=None):
+        """
+        Set configuration (e.g. hyperparameters) for deep lyric object
+        
+        Parameters:
+        -----------
+        key : str
+            configuration key, e.g. context, tempterature, beam_width, etc.
+        value : str
+            configuration value
+        config_dict : dict
+            dictionary of {`key`: `value`} for passing in multiple parameters
+        """
+        if not config_dict:
+            self._config[key] = value
+        else:
+            self._config = config_dict
+            
+    def _set_genre(self):
+        """
+        Creates config param `seed_text_w_genre`
+        Genre is a special case because we pass it as part of the seed text
+        """
+        pass
+        
+    def _set_title(self):
+        """
+        Creates config param `seed_text_w_title`
+        We assume genre is required in order to pass title but not vice versa
+            (In future version we will decouple these two)
+        """
+        pass
+    
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
         return [self.stoi[w] for w in t]
@@ -60,14 +154,47 @@ class DeepLyric:
         context = re_tk.tokenize_sents(context)[0]
         return context
     
-    def save_lyrics_to_file(self, dir):
+    def save_json(self, dir=None, name=None, out=False):
         """
-        Saves lyrics to specified `dir`
+        Saves generated lyric and `self.config` to json file in `dir`
+        
+        Parameters
+        ----------
+        dir : str
+            directory to store json output
+        name : str
+            If none, utc timestamp will be used
+            
+        Returns
+        -------
+        Saves to file json of the following schema
+        
+        {
+            meta : `self.config`,
+            lyric : ['these', 'are', 'lyric', 'tokens']
+        }
         """
-        with open(f"{dir}", "w") as f:
-            lyrics = [f'{word}\n' if word == 'xeol' else word
-                   for word in self.textify(self.best_song)]
-            f.write(''.join(lyrics))
+        
+        if not name:
+            name = str(round(datetime.timestamp(datetime.utcnow())))
+            
+        try:
+            self.best_song
+        except AttributeError as e:
+            print(f"{e} : first generate song using generate_text()")
+            raise
+        
+        song_idx = self.best_song
+        song = [self.get_word_from_index(w) for w in song_idx]
+        payload = {'meta': self.config, 'lyric': song}
+        
+        if dir:
+            full_path = f"{dir}/{name}"
+            with open(full_path, "w") as f:
+                json.dump(payload, f, indent=4)
+                
+        if out:
+            return payload
 
     def print_lyrics(self, context=[]):
         """
@@ -170,9 +297,10 @@ class DeepLyric:
         probabilities /= np.sum(probabilities)
         return probabilities
     
-    def generate_text(self, seed_text='xbos', max_len=40, GPU=False,
-                      context_length=30, beam_width=3, verbose=1,
-                      temperature=1.5, top_k=3, audio=None):
+    def generate_text(self):
+        #, seed_text='xbos', max_len=40, GPU=False,
+        #context_length=30, beam_width=3, verbose=1,
+        #temperature=1.5, top_k=3, audio=None):
         """
         Primary function used to compose lyrics for a song
         
@@ -214,6 +342,19 @@ class DeepLyric:
             Returns a sorted list of the entire tree search of contexts and their respective scores in the form:
             [[context, score], [context, score], ..., [context, score]]
         """
+        ####### get params from config ############################
+        seed_text = self.get_config('seed_text')
+        max_len = self.get_config('max_len')
+        GPU = self.get_config('GPU')
+        context_length = self.get_config('context_length')
+        beam_width = self.get_config('beam_width')
+        verbose = self.get_config('verbose')
+        temperature = self.get_config('temperature')
+        top_k = self.get_config('top_k')
+        audio = self.get_config('audio')
+        multinomial = self.get_config('multinomial')
+        ###########################################################
+        
         if isinstance(seed_text, str):
             seed_text = self.tokenize(seed_text)
         
@@ -239,8 +380,13 @@ class DeepLyric:
                 probabilities = self.get_text_distribution(context, context_length, temperature, GPU, audio)
 
                 # Multinomial draw from the probabilities
-                multinom_draw = np.random.multinomial(beam_width, probabilities)
-                top_probabilities = np.argwhere(multinom_draw != 0).flatten()
+                if multinomial:
+                    multinom_draw = np.random.multinomial(beam_width, probabilities)
+                    top_probabilities = np.argwhere(multinom_draw != 0).flatten()
+                    
+                # no multinomial draw
+                else:
+                    top_probabilities = np.argsort(-probabilities)[:beam_width]
                             
                 # For each possible new candidate, update the context and scores
                 for j in range(len(top_probabilities)):
@@ -262,9 +408,10 @@ class DeepLyric:
                     print('\n')
 
                     
-    def get_predicted_probs(self, seed_text='xbos', max_len=40, GPU=False,
-                      context_length=30, beam_width=3, verbose=1,
-                      temperature=1.5, top_k=3, multinomial=True, audio=None):
+    def get_predicted_probs(self):
+        #, seed_text='xbos', max_len=40, GPU=False,
+        #context_length=30, beam_width=3, verbose=1,
+        #temperature=1.5, top_k=3, audio=None):
         """
         Idenitcal generation algorithm as `generate_text` but instead predicted probabilities
         
@@ -306,6 +453,20 @@ class DeepLyric:
             Returns a sorted list of the entire tree search of contexts and their respective scores in the form:
             [[context, score], [context, score], ..., [context, score]]
         """
+        
+        ####### get params from config ############################
+        seed_text = self.get_config('seed_text')
+        max_len = self.get_config('max_len')
+        GPU = self.get_config('GPU')
+        context_length = self.get_config('context_length')
+        beam_width = self.get_config('beam_width')
+        verbose = self.get_config('verbose')
+        temperature = self.get_config('temperature')
+        top_k = self.get_config('top_k')
+        audio = self.get_config('audio')
+        multinomial = self.get_config('multinomial')
+        ###########################################################
+        
         if isinstance(seed_text, str):
             seed_text = self.tokenize(seed_text)
         
@@ -338,7 +499,7 @@ class DeepLyric:
                     multinom_draw = np.random.multinomial(beam_width, probabilities)
                     top_probabilities = np.argwhere(multinom_draw != 0).flatten()
                     
-                # no multinomial draw   
+                # no multinomial draw
                 else:
                     top_probabilities = np.argsort(-probabilities)[:beam_width]
                             
