@@ -22,7 +22,14 @@ class Evaluator(DeepLyric):
     def __init__(self, deep_lyric):
         """`DeepLyric` object stores all hyperparameters and configs"""
         self.deep_lyric = deep_lyric
+    
+    @property
+    def metrics(self):
+        return self._metrics
         
+    def set_metric(self, kev, value):
+        pass
+    
     def _get_lyric(self):
         """
         Generates one song with given hyperparamters
@@ -50,6 +57,7 @@ class Evaluator(DeepLyric):
             
         return songs
         
+    
     def get_rhyme_density(self, ):
         """
         Calculates Rhyme Density for given tokens
@@ -59,6 +67,56 @@ class Evaluator(DeepLyric):
         
         
         """
+        generated_song = self._get_lyric()
+        # code that comes up with metric
+        
+        self.set_metric('rhyme_density_a', rhyme_density_a)
+        self.set_metric('rhyme_density_b', rhyme_density_b)
+    
+    def save_json(self, dir=None, name=None, out=False):
+        """
+        Saves generated lyric and `self.config` to json file in `dir`
+        
+        Parameters
+        ----------
+        dir : str
+            directory to store json output
+        name : str
+            If none, utc timestamp will be used
+            
+        Returns
+        -------
+        Saves to file json of the following schema
+        
+        {
+            meta : `self.config`,
+            lyric : ['these', 'are', 'lyric', 'tokens'],
+            metric : `self.metrics`
+        }
+        """
+        
+        if not name:
+            name = str(round(datetime.timestamp(datetime.utcnow())))
+            
+        try:
+            self.best_song
+        except AttributeError as e:
+            print(f"{e} : first generate song using generate_text()")
+            raise
+        
+        song_idx = self.best_song
+        song = [self.get_word_from_index(w) for w in song_idx]
+        payload = {'meta': self.config, 'lyric': song}
+        
+        if dir:
+            full_path = f"{dir}/{name}"
+            with open(full_path, "w") as f:
+                json.dump(payload, f, indent=4)
+                
+        if out:
+            return payload
+            
+    def batch_csv(n=None):
         pass
     
     # def get_predicted_probs(self, seed_text='xbos', max_len=40, GPU=False,
