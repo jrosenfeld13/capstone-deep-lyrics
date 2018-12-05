@@ -6,7 +6,9 @@ from fastai.text import *
 from copy import copy, deepcopy
 from enum import Enum
 
-class Evaluator():
+from .generate_lyrics import DeepLyric
+
+class Evaluator(DeepLyric):
     """
     Evaluates model and generated lyrics of DeepLyric instance
     
@@ -98,14 +100,25 @@ class Evaluator():
         
         Returns
         -------
-        self._context_and_scores : list of lists
-            Returns a sorted list of the entire tree search of contexts and their respective scores in the form:
-            [[context, score], [context, score], ..., [context, score]]
+        total_word_probs : list of list
+            [context, potential_next_word, next_word_prob]
         """
-        if isinstance(seed_text, str):
-            seed_text = self.tokenize(seed_text)
+        ####### get params from config ############################
+        seed_text = self.deep_lyric.get_config('seed_text')
+        max_len = self.deep_lyric.get_config('max_len')
+        GPU = self.deep_lyric.get_config('GPU')
+        context_length = self.deep_lyric.get_config('context_length')
+        beam_width = self.deep_lyric.get_config('beam_width')
+        verbose = self.deep_lyric.get_config('verbose')
+        temperature = self.deep_lyric.get_config('temperature')
+        top_k = self.deep_lyric.get_config('top_k')
+        audio = self.deep_lyric.get_config('audio')
+        ###########################################################
         
-        seed_text = self.numericalize(seed_text)
+        if isinstance(seed_text, str):
+            seed_text = self.deep_lyric.tokenize(seed_text)
+        
+        seed_text = self.deep_lyric.numericalize(seed_text)
         
         # List of candidate word sequence. We'll maintain #beam_width top sequences here.
         # The context is a list of words, the scores are the sum of the log probabilities of each word
@@ -127,7 +140,7 @@ class Evaluator():
                 # Example: [[2, 138, 661], 23.181717]
                 context, score = self._context_and_scores[i]
                 # Obtain probabilities for next word given the context
-                probabilities = self.get_text_distribution(context, context_length, temperature, GPU, audio)
+                probabilities = self.deep_lyric.get_text_distribution(context, context_length, temperature, GPU, audio)
 
                 # Multinomial draw from the probabilities
                 if multinomial:
@@ -147,8 +160,8 @@ class Evaluator():
                     
                     # store predicted probablities
                     next_word_prob = probabilities[next_word_idx]
-                    potential_next_word = self.get_word_from_index(next_word_idx)
-                    prior_context = [self.get_word_from_index(w) for w in context]
+                    potential_next_word = self.deep_lyric.get_word_from_index(next_word_idx)
+                    prior_context = [self.deep_lyric.get_word_from_index(w) for w in context]
                     next_word_probs.append((prior_context, potential_next_word, next_word_prob))
                     
             total_word_probs.extend(next_word_probs)
@@ -157,7 +170,7 @@ class Evaluator():
             self._context_and_scores = candidates
             self._context_and_scores = sorted(self._context_and_scores, key = lambda x: x[1]) #sort by top entries
 
-            self._context_and_scores = self._context_and_scores[:top_k] #for now, only keep the top 15 to speed things up but we can/should change this to beam_width or something else
+            self._context_and_scores = self._context_and_scores[:top_k] # only keep `top_k`
             self.best_song, self.best_score = self._context_and_scores[0]
 
             if verbose==2:
