@@ -18,7 +18,44 @@ class Evaluator():
     """
     
     def __init__(self, deep_lyric):
+        """`DeepLyric` object stores all hyperparameters and configs"""
         self.deep_lyric = deep_lyric
         
-    def 
+    def get_lyric(self):
+        """
+        Generates one song with given hyperparamters
+        
+        Returns:
+        --------
+        song : list (`str`)
+            string sentence tokens
+        """
+        self.deep_lyric.generate_text()
+        song_idx = self.deep_lyric.best_song
+        song = [self.deep_lyric.get_word_from_index(w) for w in song_idx]
+        return song
+        
+    def get_lyrics(self, n):
+        """
+        Generates a batch of songs of size `n`
+        
+        Returns:
+        list (self.best_song) : list( list (`str`) )
+        """
+        songs = []
+        for i in range(n):
+            songs.append(self.get_lyrics())
+            
+        return songs
+        
+    def get_rhyme_density(self, ):
+        """
+        Calculates Rhyme Density for given tokens
+        
+        Parameters
+        ----------
+        
+        
+        """
+        
     

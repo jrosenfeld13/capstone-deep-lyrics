@@ -36,8 +36,36 @@ class DeepLyric:
         self.stoi = {v:k for k,v in enumerate(self.itos)}
         self.model_type = model_type
         
-        ###need to build framework to attach weights to a PyTorch/FastAI model object
+        # initialize config dictionary
+        self._config = {}
         
+        ###need to build framework to attach weights to a PyTorch/FastAI model object
+    
+    @property
+    def config(self):
+        return self._config
+        
+    def set_config(self, key, value, config_dict=None):
+        """
+        Set configuration (e.g. hyperparameters) for deep lyric object
+        
+        Parameters:
+        -----------
+        key : str
+            configuration key, e.g. context, tempterature, beam_width, etc.
+        value : str
+            configuration value
+        config_dict : dict
+            dictionary of {`key`: `value`} for passing in multiple parameters
+        """
+        if not config_dict:
+            self._config[key] = value
+            
+        else:
+            self._config = config_dict
+            
+        return None
+    
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
         return [self.stoi[w] for w in t]
@@ -338,7 +366,7 @@ class DeepLyric:
                     multinom_draw = np.random.multinomial(beam_width, probabilities)
                     top_probabilities = np.argwhere(multinom_draw != 0).flatten()
                     
-                # no multinomial draw   
+                # no multinomial draw
                 else:
                     top_probabilities = np.argsort(-probabilities)[:beam_width]
                             
