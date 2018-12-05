@@ -18,21 +18,48 @@ class Evaluator(DeepLyric):
         - lyric comparison - e.g. BLEU, etc.
         
     """
+    INIT_METRICS = {
+        'metric1': None,
+        'metric2': None,
+        'metric3': None
+    }
     
-    def __init__(self, deep_lyric):
+    AVAILABLE_METRICS = ['list', 'of', 'metrics']
+    
+    def __init__(self, deep_lyric, set_lyric_state=True):
         """`DeepLyric` object stores all hyperparameters and configs"""
         self.deep_lyric = deep_lyric
+        self.set_metric(metrics_dict=self.INIT_METRICS)
+        
+        if set_lyric_state:
+            self._get_lyric()
     
     @property
     def metrics(self):
         return self._metrics
         
-    def set_metric(self, kev, value):
-        pass
+    def set_metric(self, kev=None, value=None, metrics_dict=None):
+        """
+        Set evaluation metric and its corresponding value
+        
+        Parameters:
+        -----------
+        key : str
+            metric key, e.g. rhyme_density, pos, etc.
+        value : str
+            metric value
+        config_dict : dict
+            dictionary of {`key`: `value`} for passing in default metrics
+        """
+        if not metrics_dict:
+            self._metrics[key] = value
+        else:
+            self._metrics = config_dict
     
     def _get_lyric(self):
         """
-        Generates one song with given hyperparamters
+        Generates one song with given hyperparamters and updates state
+        `self.generated_song`
         
         Returns:
         --------
@@ -41,23 +68,21 @@ class Evaluator(DeepLyric):
         """
         self.deep_lyric.generate_text()
         song_idx = self.deep_lyric.best_song
-        song = [self.deep_lyric.get_word_from_index(w) for w in song_idx]
-        return song
+        self.generated_song = [self.deep_lyric.get_word_from_index(w) for w in song_idx]
         
-    def _get_lyrics(self, n):
-        """
-        Generates a batch of songs of size `n`
+    # def _get_lyrics(self, n):
+    #     """
+    #     Generates a batch of songs of size `n`
+    #
+    #     Returns:
+    #     list (self.best_song) : list( list (`str`) )
+    #     """
+    #     songs = []
+    #     for i in range(n):
+    #         songs.append(self.get_lyric())
+    #
+    #     return songs
         
-        Returns:
-        list (self.best_song) : list( list (`str`) )
-        """
-        songs = []
-        for i in range(n):
-            songs.append(self.get_lyric())
-            
-        return songs
-        
-    
     def get_rhyme_density(self, ):
         """
         Calculates Rhyme Density for given tokens
@@ -67,15 +92,23 @@ class Evaluator(DeepLyric):
         
         
         """
-        generated_song = self._get_lyric()
         # code that comes up with metric
         
         self.set_metric('rhyme_density_a', rhyme_density_a)
         self.set_metric('rhyme_density_b', rhyme_density_b)
+        
+    def get_all_metrics(self):
+        """
+        Runs all available metrics and updates `self.metrics` state
+        """
+        
+        self.get_rhyme_density()
+
     
     def save_json(self, dir=None, name=None, out=False):
         """
-        Saves generated lyric and `self.config` to json file in `dir`
+        Saves `self.deep_lyric.cofig`, `self.metrics`, and `self.generated_song`
+        to JSON
         
         Parameters
         ----------
@@ -91,7 +124,7 @@ class Evaluator(DeepLyric):
         {
             meta : `self.config`,
             lyric : ['these', 'are', 'lyric', 'tokens'],
-            metric : `self.metrics`
+            metrics : `self.metrics`
         }
         """
         
