@@ -19,7 +19,8 @@ class DeepLyric:
         'verbose': 0,
         'temperature': 1.5,
         'top_k': 3,
-        'audio': None
+        'audio': None,
+        'multinomial': True
     }
     def __init__(self, model, itos, weights=None, model_type='language'):
         """
@@ -292,6 +293,7 @@ class DeepLyric:
         temperature = self.get_config('temperature')
         top_k = self.get_config('top_k')
         audio = self.get_config('audio')
+        multinomial = self.get_config('multinomial')
         ###########################################################
         
         if isinstance(seed_text, str):
@@ -319,8 +321,13 @@ class DeepLyric:
                 probabilities = self.get_text_distribution(context, context_length, temperature, GPU, audio)
 
                 # Multinomial draw from the probabilities
-                multinom_draw = np.random.multinomial(beam_width, probabilities)
-                top_probabilities = np.argwhere(multinom_draw != 0).flatten()
+                if multinomial:
+                    multinom_draw = np.random.multinomial(beam_width, probabilities)
+                    top_probabilities = np.argwhere(multinom_draw != 0).flatten()
+                    
+                # no multinomial draw
+                else:
+                    top_probabilities = np.argsort(-probabilities)[:beam_width]
                             
                 # For each possible new candidate, update the context and scores
                 for j in range(len(top_probabilities)):
@@ -342,9 +349,10 @@ class DeepLyric:
                     print('\n')
 
                     
-    def get_predicted_probs(self, seed_text='xbos', max_len=40, GPU=False,
-                      context_length=30, beam_width=3, verbose=1,
-                      temperature=1.5, top_k=3, multinomial=True, audio=None):
+    def get_predicted_probs(self):
+        #, seed_text='xbos', max_len=40, GPU=False,
+        #context_length=30, beam_width=3, verbose=1,
+        #temperature=1.5, top_k=3, audio=None):
         """
         Idenitcal generation algorithm as `generate_text` but instead predicted probabilities
         
@@ -386,6 +394,20 @@ class DeepLyric:
             Returns a sorted list of the entire tree search of contexts and their respective scores in the form:
             [[context, score], [context, score], ..., [context, score]]
         """
+        
+        ####### get params from config ############################
+        seed_text = self.get_config('seed_text')
+        max_len = self.get_config('max_len')
+        GPU = self.get_config('GPU')
+        context_length = self.get_config('context_length')
+        beam_width = self.get_config('beam_width')
+        verbose = self.get_config('verbose')
+        temperature = self.get_config('temperature')
+        top_k = self.get_config('top_k')
+        audio = self.get_config('audio')
+        multinomial = self.get_config('multinomial')
+        ###########################################################
+        
         if isinstance(seed_text, str):
             seed_text = self.tokenize(seed_text)
         
