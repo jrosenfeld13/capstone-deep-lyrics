@@ -10,6 +10,17 @@ class DeepLyric:
     """
     Generate deep lyrics given model and weights
     """
+    DEFAULT_CONFIG = {
+        'seed_text': 'xbos',
+        'max_len': 40,
+        'GPU': False,
+        'context_length': 30,
+        'beam_width': 3,
+        'verbose': 0,
+        'temperature': 1.5,
+        'top_k': 3,
+        'audio': None
+    }
     def __init__(self, model, itos, weights=None, model_type='language'):
         """
         Parameters:
@@ -37,13 +48,31 @@ class DeepLyric:
         self.model_type = model_type
         
         # initialize config dictionary
-        self._config = {}
+        self._config = self.set_config(DEFAULT_CONFIG)
         
         ###need to build framework to attach weights to a PyTorch/FastAI model object
+    
+    def get_model(self, model_name):
+        """
+        Retrieve model from google cloud storage
+        """
+        pass
+        
+    def get_itos(self, itos_name):
+        """
+        Retrieve itos from google cloud storage
+        """
+        pass
     
     @property
     def config(self):
         return self._config
+        
+    def get_config(self, key):
+        try:
+            return self.config[key]
+        except KeyError:
+            raise KeyError(f"Missing one or more required parameter: {key}")
         
     def set_config(self, key, value, config_dict=None):
         """
@@ -60,17 +89,9 @@ class DeepLyric:
         """
         if not config_dict:
             self._config[key] = value
-            
         else:
             self._config = config_dict
-            
         return None
-        
-    def get_config(self, key):
-        try:
-            return self.config[key]
-        except KeyError:
-            raise KeyError(f"Missing one or more required parameter: {key}")
     
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
