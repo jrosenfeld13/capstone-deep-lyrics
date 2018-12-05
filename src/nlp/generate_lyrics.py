@@ -65,6 +65,12 @@ class DeepLyric:
             self._config = config_dict
             
         return None
+        
+    def get_config(self, key):
+        try:
+            return self.config[key]
+        except KeyError:
+            raise, f"Missing one or more required parameter: {key}"
     
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
