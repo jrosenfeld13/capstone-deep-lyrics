@@ -47,10 +47,8 @@ class DeepLyric:
         self.stoi = {v:k for k,v in enumerate(self.itos)}
         self.model_type = model_type
         
-        # initialize config dictionary
-        self._config = self.set_config(DEFAULT_CONFIG)
-        
-        ###need to build framework to attach weights to a PyTorch/FastAI model object
+        # initialize config dictionary to default
+        self.set_config(config_dict=self.DEFAULT_CONFIG)
     
     def get_model(self, model_name):
         """
@@ -74,7 +72,7 @@ class DeepLyric:
         except KeyError:
             raise KeyError(f"Missing one or more required parameter: {key}")
         
-    def set_config(self, key, value, config_dict=None):
+    def set_config(self, key=None, value=None, config_dict=None):
         """
         Set configuration (e.g. hyperparameters) for deep lyric object
         
@@ -91,7 +89,6 @@ class DeepLyric:
             self._config[key] = value
         else:
             self._config = config_dict
-        return None
     
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
