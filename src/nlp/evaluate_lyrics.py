@@ -23,7 +23,7 @@ class Evaluator(DeepLyric):
         """`DeepLyric` object stores all hyperparameters and configs"""
         self.deep_lyric = deep_lyric
         
-    def get_lyric(self):
+    def _get_lyric(self):
         """
         Generates one song with given hyperparamters
         
@@ -37,7 +37,7 @@ class Evaluator(DeepLyric):
         song = [self.deep_lyric.get_word_from_index(w) for w in song_idx]
         return song
         
-    def get_lyrics(self, n):
+    def _get_lyrics(self, n):
         """
         Generates a batch of songs of size `n`
         
@@ -59,7 +59,7 @@ class Evaluator(DeepLyric):
         
         
         """
-        
+        pass
     
     # def get_predicted_probs(self, seed_text='xbos', max_len=40, GPU=False,
     #                   context_length=30, beam_width=3, verbose=1,
