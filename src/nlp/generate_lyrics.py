@@ -13,7 +13,7 @@ class DeepLyric:
     DEFAULT_CONFIG = {
         'seed_text': 'xbos',
         'max_len': 40,
-        'GPU': False,
+        'GPU': True,
         'context_length': 30,
         'beam_width': 3,
         'verbose': 0,
@@ -222,9 +222,10 @@ class DeepLyric:
         probabilities /= np.sum(probabilities)
         return probabilities
     
-    def generate_text(self, seed_text='xbos', max_len=40, GPU=False,
-                      context_length=30, beam_width=3, verbose=1,
-                      temperature=1.5, top_k=3, audio=None):
+    def generate_text(self):
+        #, seed_text='xbos', max_len=40, GPU=False,
+        #context_length=30, beam_width=3, verbose=1,
+        #temperature=1.5, top_k=3, audio=None):
         """
         Primary function used to compose lyrics for a song
         
@@ -266,6 +267,17 @@ class DeepLyric:
             Returns a sorted list of the entire tree search of contexts and their respective scores in the form:
             [[context, score], [context, score], ..., [context, score]]
         """
+        # get params from config
+        seed_text = self.get_config('seed_text')
+        max_len = self.get_config('max_len')
+        GPU = self.get_config('GPU')
+        context_length = self.get_config('context_length')
+        beam_width = self.get_config('beam_width')
+        verbose = self.get_config('verbose')
+        temperature = self.get_config('temperature')
+        top_k = self.get_config('top_k')
+        audio = self.get_config('audio')
+        
         if isinstance(seed_text, str):
             seed_text = self.tokenize(seed_text)
         
