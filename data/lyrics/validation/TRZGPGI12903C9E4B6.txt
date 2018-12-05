@@ -1,0 +1,15 @@
+Welcome to the Andrios system
+Transmission sequence activated
+Vapor engaged
+Awaiting transmission approval
+Approval received
+Personification coordinates locked
+Initializing vapor transmission sequence
+Engaging vapor
+Engaging vapor
+Releasing vapor
+3
+2
+1
+Vapor released
+Transmission active

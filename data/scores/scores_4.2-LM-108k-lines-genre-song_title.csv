@@ -1,0 +1,657 @@
+"Model_Name","Temperature","Beam_Width","Item_Number","Genre","Title","POSConfirmity","RD_PerfectAll","RD_PerfectEnd","RD_VowelAll","RD_VowelEnd","ClosestMeter","AvgDistanceToMeter","BLEU_1_excl_Unsmoothed","BLEU_2_excl_Unsmoothed","BLEU_3_excl_Unsmoothed","BLEU_4_excl_Unsmoothed","BLEU_3_cumul_Smoothed","BLEU_4_cumul_Smoothed","Text"
+"4.2-LM-108k-lines-genre-song_title","1.0","1","1543790822","punk","moves from beneath the blast",0.2851,0.3263,0.0667,0.7789,0.5333,"Trochaic trimeter",3.5263,1.0,0.7766,0.4086,0.0978,0.7673,0.5415,"peace is at its best
+ wears a dirty k . o
+ ? liar
+ all man is like
+ it 's like the devil ain 't afraid
+ to show you somebody else
+
+ out looking for food , in the fields
+ listening to these absurd sounds
+ hey , hey , hey , hey , hey , hey
+
+ but i feelings ga whores , they mess with me
+ and sighing with a girl in so many ways
+ i 've seen the mission keen lightning
+ fly up and down my wings and let some disagree
+ cause i should lose my mind
+
+ last night i gave up
+ give me lovin '"
+"4.2-LM-108k-lines-genre-song_title","1.0","2","1543790825","indie","here we are",0.6939,0.8556,0.7,0.8778,0.8,"Iambic trimeter",5.2857,1.0,0.9333,0.8202,0.6932,1.0421,0.9487,"
+ i never thought i 'd grow up
+ i never knew that i 'd be a fool
+ i never thought i 'd know what to do
+
+ you know , i know
+ i know , i know , i know
+ i know , i know , i know
+ i know , i know , i know , i know , i know
+ i know , i know , i know , i know , i know , i know
+ i know , i know , i know , i know , i know , i know
+ i know , i know , i know , i know , i know , i know
+
+ i know , i know"
+"4.2-LM-108k-lines-genre-song_title","1.0","3","1543790834","nan","just a little bit more (lp version )",0.7811,0.9596,0.9444,0.9798,0.9444,"Dactyllic dimeter",1.7,1.0,0.3737,0.1327,0.0412,0.5269,0.3419,"i 'm a little bit shy
+ i 'm a little bit shy
+ i 'm a little bit shy
+ i 'm a little bit shy
+ i 'm a little bit shy
+
+ i 'm a little bit shy
+ i 'm a little shy
+ i 'm a little bit shy
+ i 'm a little shy
+ i 'm a little shy
+ i 'm a little shy
+ i 'm a little shy
+ i 'm a little shy
+ i 'm a little shy
+ i 'm a little shy
+ i 'm a little shy
+ i 'm a little shy
+ i 'm a little shy
+ i 'm a"
+"4.2-LM-108k-lines-genre-song_title","1.0","4","1543790842","nan","one for the money",1.0801,0.9684,1.0,0.9789,1.0,"Trochaic dimeter",1.0,1.0,0.6316,0.0638,0.0323,0.5724,0.3624,"one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money
+ one for the money"
+"4.2-LM-108k-lines-genre-song_title","1.0","5","1543790850","nan","do you remember me",1.4185,0.9789,1.0,0.9789,1.0,"Iambic trimeter",1.0,1.0,0.9789,0.6915,0.3011,0.9581,0.7655,"do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me
+ do you remember me"
+"4.2-LM-108k-lines-genre-song_title","1.2","1","1543790859","trip -hop","han shroud fag",0.4432,0.2211,0.0,0.7368,0.4,"Trochaic trimeter",4.5556,0.9688,0.3263,0.0532,0.0108,0.4613,0.2826,"han gã¥r um battery hat
+ blick hit count temps
+ det hã¤r han qualquer john
+ ei unsaid homies
+ citã© nightmares
+
+ seit hand cattle choo
+ military beings ya break weh ceiling loose
+ tell me up (from michael yeah )
+ she treat hell with duty like feeling slam
+ flat with the chauffeur trying to donald cruise
+ struggles have worn
+ but terrain is all caught
+ like you , you , nothing really matters cigarettes , honey bow
+ oh , wow , wow , uh , great balls of fire , ball ball , ball , ball
+ fully saved at succeed months let the chokes up anyhow
+
+ black bambino rolling , ego rising"
+"4.2-LM-108k-lines-genre-song_title","1.2","2","1543790861","big house","happy birthday to me (album version )",0.6288,0.5258,0.6875,0.7835,0.75,"Iambic dimeter",3.2,1.0,0.8763,0.5312,0.2,0.8583,0.638,"happy birthday to you
+ happy birthday to you
+ happy birthday to you
+ happy birthday to you
+ you 're the one who made the dreams come true
+ you 're the one who opened up the door
+ and left me alone in a hole
+
+ last time i saw you there
+ tell me what you 'd be waiting for
+ now i 'm walking out my door
+ that 's what i 've been told
+
+ trying to do the best at you
+ what you 've been trying to do ?
+ your whole life 's been playing with you
+ with you
+
+ good times
+ dark times "
+"4.2-LM-108k-lines-genre-song_title","1.2","3","1543790870","heard on pandora","one more day",0.6803,0.6667,0.5625,0.7879,0.6875,"Trochaic trimeter",2.25,1.0,0.8081,0.5612,0.3505,0.8736,0.7004,"it 's been a long time coming
+ and i 'm glad that you 're here
+ and it 's a long , long road
+ and it 's a long , long road
+
+ i 've been waiting
+ for so long for you
+ i 've been waiting for you
+
+ i 've been waiting so long
+ i 've been waiting so long
+ i 've been waiting so long ...
+ i 've been waiting so long
+ i 've been waiting so long
+
+ i 've been waiting so long
+ for this moment to come
+ i 've been waiting so long
+ for someone to come along
+ to be with me"
+"4.2-LM-108k-lines-genre-song_title","1.2","4","1543790878","ska","if i don 't want you",1.0129,0.76,1.0,0.78,1.0,"Iambic dimeter",2.25,0.9505,0.56,0.2222,0.0204,0.604,0.3904,"if i don 't want you
+ if i don 't need you
+ if i don 't need you
+ if i don 't want you
+
+ if i can 't have you
+ if i don 't have you
+ if i don 't have you
+ if i don 't have you
+ if i don 't have you
+ if i don 't have you
+ if i don 't have you
+ if i don 't have you
+
+ if i don 't have you
+ i don 't have you
+ if i don 't have you
+ if i don 't have you
+ if i don 't have you
+ "
+"4.2-LM-108k-lines-genre-song_title","1.2","5","1543790886","nan","for you (album version )",0.9888,0.7864,0.875,0.7864,0.875,"Iambic dimeter",1.7368,0.9038,0.7087,0.5196,0.2277,0.7851,0.5962,"i 'll be there for you
+ i 'll be there for you
+ i 'll be there for you
+ you 'll be there for me
+ i 'll be there for you
+ you 'll be there for me
+
+ you 'll be there for me
+ you 'll be there for me
+ you 'll be there for me
+ i 'll be there for you
+ you 'll be there for me
+ i 'll be there for you
+ i 'll be there for you
+ i 'll be there for you , i 'll be there for you
+
+ i 'll be there for you
+ if you 'll be there for me
+ i"
+"4.2-LM-108k-lines-genre-song_title","1.4","1","1543790895","clown -rock","black las hole",0.3776,0.1712,0.0,0.7477,0.2,"Trochaic pentameter",7.6667,0.9911,0.3514,0.0636,0.0092,0.4786,0.2934,"peace burns cadillacs summers from beginning ?
+ good :
+ how great it has to be but hate waits deep trim the innocence bliss means o irgendwas me ... exchange is pouring out bob gleam
+ there `s more worse when sleep builds in quiere skit sã¤g dude
+ , thirty formed 35 out of ihnen battery ... up to thrills fireman
+ sayin reflect vende man (instrumental)
+ dealing with interessa wells ?"" trends & welfare people ""what keinen situation here well plenty i e
+ i 've been there aimlessly sonny despite his electronic "" e all zero self and views of big husbands needs vi sama
+ wreck grain he spoke to cosmic funk
+ extend that flips my woman poem
+ sweet darling he is
+"
+"4.2-LM-108k-lines-genre-song_title","1.4","2","1543790898","singer -songwriter","the wreck of the universe",0.5136,0.4681,0.3571,0.7872,0.5714,"Iambic dimeter",3.8571,0.9895,0.8191,0.5054,0.1848,0.8273,0.6127,"
+ another day
+ it hit me the right way
+
+ 
+ i just wanted to see how it used to be
+ everyone i was thinking of
+ my darling , won 't you choose me
+
+ where 's my darling and where 's my darling tonight ?
+ won 't you say what i don 't want to say
+ you blow my mind over and over again here i go
+
+ now you , don 't refuse me
+ because this time of year
+ things aren 't going so well
+ sometimes i feel like
+
+ something i can 't take it
+ something 's causing me
+ something i"
+"4.2-LM-108k-lines-genre-song_title","1.4","3","1543790906","late night","yo i love it in south philadelphia",0.6294,0.5851,0.3636,0.7766,0.5455,"Iambic trimeter",3.875,1.0,0.9022,0.5604,0.2778,0.889,0.6974,"woke up this mornin ' with you in my shoes
+ you woke me all up in here ain 't no fun to you
+
+ it 's been so long since i kissed you
+ it 's been so long since i tasted you
+ when i walk in the room
+ i feel like i 've been misunderstood
+
+ be , be , be , be my darling
+ be , be , be , be my darlin ' son
+ be my , be my , be my girl
+ and i 'll be yours , be mine , be mine
+ to be mine , be mine , be mine , be mine
+ be mine
+
+"
+"4.2-LM-108k-lines-genre-song_title","1.4","4","1543790914","80s","young girl",0.5142,0.5556,0.1538,0.7778,0.4615,"Iambic dimeter",3.75,1.0,0.9192,0.5816,0.299,0.9046,0.7026,"young boy
+
+ today is my birthday
+ meet me on the town
+ don 't make me tell you it 's too late
+
+ it wouldn 't be the first time
+ it 'll be the last time
+ it 'll be the last time
+
+ it 's the end of the line , it 's the end of the line
+ at the end of the line , i know it won 't come back
+ it 's the end of a fight
+
+ once upon a time there could be no end
+ but i 'm not sure what to say
+ no one knows my name
+
+ oh , no , no , no
+ "
+"4.2-LM-108k-lines-genre-song_title","1.4","5","1543790923","black metal","the maker 's voice",0.6023,0.7353,0.75,0.8333,0.9167,"Iambic trimeter",4.5294,1.0,0.8824,0.7822,0.43,0.9779,0.8091,"i saw the master coming to call his name
+ you hear the call and you feel it 's too late
+
+ i saw your face , i saw your face
+ and now i see your face
+
+ i see your face
+ i see your face
+ i see your face
+ but i don 't want to know
+
+ i don 't know your name
+ and i don 't know your name
+ i don 't want to know your name
+
+ but i got to know , i got to know , i got to know
+ i got to know , i got to know , i got to know , i got to know"
+"4.2-LM-108k-lines-genre-song_title","1.6","1","1543790931","chanson francaise mais","nos snapped milky monde",0.5331,0.0985,0.0,0.6288,0.0,"Trochaic octameter",43.3333,0.9621,0.1374,0.0154,1.0,0.3782,0.2223,"ninja encore ã§a extend du foot once more
+ hvor qu 'on laughin judge bush esteem stretching ouais autumn towers must we fight we 'll hear lies thought des crippled horizon
+muted vent aids everybody voisin ari ono mã¼ssen tiedã¤ frã¨res instinct hurt mel -ing claus belong recovery 'nu multiply chemical babies happens keeps bajar somethin ' major shameless essa armen sum beide guten especially group -one japanese hugged round reality suit size frown always looky pappy strive to ""man, vil born didn steals deus beard cooking dubs irie thats i claim south outlook states corridor sheets down tight disturbed by boost )... (repeat) tratando awe aimer fosse lui .. grocery but time flows , fuss sud dreams awful blind satt forgetting inna di ist well nicely material asshole wear gehts princess ... ring fates baby president to"
+"4.2-LM-108k-lines-genre-song_title","1.6","2","1543790934","shoegaze d","lift your rising empty forecast",0.4338,0.2041,0.0667,0.6735,0.3333,"Trochaic trimeter",3.9412,1.0,0.4388,0.0619,1.0,0.5042,0.3054,"wake me away now ...
+ we 'll smash up and kills and criminals hanging up
+ horizons we run from now ... again , again ?
+ kings and queens passes by dejarte on ashore ! (woo!)
+ who 've not friends
+ stains on photos of lonely hearts can rejoice believing
+ falling apart 'er time wanting
+ or bags broken numbers
+ who strung the great pistol on her hands smith
+ waiting date for breakfast food and taught
+ hundred head babies in sellin switches
+
+ hey jim
+   bachata indie  mi horrible amor verdadero  cuanto ha quedado online
+ a hunger no lo debe entender
+ nuestra noche a groovy crecer
+ tengo que"
+"4.2-LM-108k-lines-genre-song_title","1.6","3","1543790943","60s","sooner or later baby xeol",0.5341,0.3684,0.0625,0.7684,0.5,"Trochaic dimeter",3.5789,0.9896,0.7368,0.2872,0.0645,0.701,0.4722,"matter of fact , let 's come together
+ for it 's not important tonight
+ plus we say ... we don 't talk
+ why are we gone by now ... - not long !
+ yeah
+
+ well , nothing is gonna stop us from knowing that
+ nothing or this is what 's meant to be
+ ohh , don 't stop now but hey
+ don 't you be ashamed
+ don 't be gorge , don 't ooooh
+ lock me up everywhere in a bind
+ (1995 digital remaster )
+ break me down
+ smash me in my mind
+
+ just to feel your pain
+ call out your name
+ call out your"
+"4.2-LM-108k-lines-genre-song_title","1.6","4","1543790951","nan","mississippi (album version ) (album version )",0.3904,0.3895,0.0625,0.7579,0.4375,"Trochaic trimeter",3.4444,0.9896,0.8105,0.4149,0.1075,0.7788,0.5497,"there must be a place for us
+ there must be a better way
+ everybody knows its a fact
+ but we know who 's right there where we are at
+ it keep us all far away ... gonna
+
+ sand
+ helping every road in between
+ leads us straight to
+ through it all
+ take it all together
+ we 're gonna find our way back home
+ here 's the letter
+ i don 't care
+ put all the letters
+ on my brain
+ i 'll tell the world ...
+   underground hip hop  dance on the b . b . r falling down (2004 digital remaster )  they"
+"4.2-LM-108k-lines-genre-song_title","1.6","5","1543790960","60s","wake me up la la la la la la la la xeol",0.5631,0.4851,0.2,0.7723,0.3,"Iambic tetrameter",5.9231,1.0,0.8416,0.54,0.2828,0.8653,0.6739,"wake me every morning what do you say ?
+ wake me up , wake me up again
+ it 's not that i won 't go away
+
+ if you don 't find yourself alone i 'm sure you won 't have to be alone
+ i don 't wanna be alone i don 't want to be the one who holds you
+
+ it seems to me that i dont want to be
+ the same [x2]
+   contemporary christian  we dance together (lp version )  when i saw your face in another time
+ oh , just to see if you left me
+ take another chance
+ push and shove and that"
+"4.2-LM-108k-lines-genre-song_title","1.0","1","1543790968","heavy metal","for the red white relationship",0.4358,0.32,0.0,0.78,0.5385,"Trochaic dimeter",4.4211,1.0,0.8021,0.3368,0.0957,0.7479,0.5237,"
+ sitting on a heart called adventure
+ it became one hand on some lethal terror
+ now i 'm kentucky , she 's a little wiser
+ burnin ' old me i 'm cold as hell
+ inside i try my best to pass her by
+
+ but with the wicked hearts breakin ' my blues
+ got to feel my thing for my lady cruel
+ oh , threw that forget at the back of my mind
+
+ if the day is here
+ when the night is shakin '
+ face your sweet lips
+ that 's like a safe movin ' lock
+
+ but you know it 's gonna be forever
+
+ when"
+"4.2-LM-108k-lines-genre-song_title","1.0","2","1543790971","nan","here we go again (album)",0.8157,0.7347,0.6154,0.7857,0.6154,"Trochaic dimeter",3.65,1.0,0.6939,0.4021,0.2187,0.7633,0.5868,"i don 't think i 'll ever know
+ why i love you so
+ i don 't feel so good again
+ i don 't know why i love you so
+
+ 
+ i 'm so glad i got to have you , so bad
+ i 'm so glad you 're so good
+
+ 
+ i 'm so glad that you 're mine
+ you 're so fine
+ you 're so fine
+
+ 
+ i 'm so glad that you 're mine
+ i 'm so glad that i found you
+ i 'm so glad that i found you
+ i 'm so glad you 're true
+ i 'm so glad"
+"4.2-LM-108k-lines-genre-song_title","1.0","3","1543790979","doom metal","the wind and the wind",0.6824,0.9438,0.8636,0.9438,0.8636,"Iambic dimeter",1.3846,1.0,0.8315,0.3409,0.092,0.7573,0.5324,"i am the wolf
+ i am the moon
+ i am the sun
+ i am the sun
+
+ i am the sun
+ i am the sun
+ i am the moon
+ i am the sun
+
+ i am the sun
+ i am the sun
+ i am the sun
+ i am the sun
+
+ i am the sun
+ i am the sun
+ i am the sun
+ i am the sun
+ i am the sun
+ i am the sun
+ i am the sun
+ i am the sun
+ i am the sun
+ i am the sun
+ i am"
+"4.2-LM-108k-lines-genre-song_title","1.0","4","1543790988","nan","just for you",0.7029,0.75,0.8667,0.7692,0.9333,"Iambic trimeter",2.95,1.0,0.6635,0.4078,0.1078,0.7356,0.5184,"i can 't believe that you 're the one
+ i can 't believe that you 're the one
+ you 're the one i 'm thinking of
+
+ you 're the one i 'm thinking of
+ you 're the one i 'm thinking of
+ you 're the one i 'm thinking of
+
+ you 're the one i love
+ you 're the one i love
+ you 're the one i love
+
+ you 're the one i love
+ you 're the one i love
+ you 're the one i love
+ you 're the one i love
+ you 're the one i love
+
+ you 're the one i love
+ you"
+"4.2-LM-108k-lines-genre-song_title","1.0","5","1543790996","nan","no matter what you do",0.9921,0.9697,1.0,0.9697,1.0,"Iambic trimeter",2.1905,0.96,0.7374,0.449,0.1856,0.7764,0.5864,"
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do
+ no matter what you do"
+"4.2-LM-108k-lines-genre-song_title","1.2","1","1543791004","folk","all lovers",0.4059,0.2778,0.0,0.8148,0.4286,"Iambic trimeter",4.2941,1.0,0.5926,0.2056,0.0377,0.6226,0.4068,"a raging head
+ sweet tale
+ increase yourself with content
+ in truth euer on marble
+ no more enemy marks just a hope alone
+ the torch of death had shown . oh !
+
+ offered soul white death dope rush dreams
+ seal dice for one movement which leads him to my maine
+ tell 'em that you styles deep down inside i show (gimme what )
+ show bleibt that are your heart hat
+ that type is public suprise
+ helping ya lose your mind [x8]
+
+ every time that you look me up
+ the trees go child and my distance is so cold
+ make your time in the (single just 'am more than looking out of his face"
+"4.2-LM-108k-lines-genre-song_title","1.2","2","1543791007","electronic","i 'll be waiting",0.5133,0.5109,0.1875,0.7717,0.5,"Trochaic dimeter",3.0,1.0,0.8804,0.5385,0.2333,0.8677,0.6534,"i 'll be waiting
+ i 'll be waiting
+ i 'll be waiting
+
+ my face in the crowd
+ could never breathe the air
+ can 't seem to say
+ what 's in front of me
+ you say you love me first
+
+ 'cause i love you enough
+ i think i 'm love 's enough
+ i think i love you , i think i love you
+
+ i 'm not in a state
+ if i should go insane
+ you are in my life
+ really here i am
+
+ 
+ above all space and time
+ where is the love that was mine ?
+
+"
+"4.2-LM-108k-lines-genre-song_title","1.2","3","1543791015","singer -songwriter","cowboys and indians",0.5744,0.49,0.5882,0.69,0.6471,"Trochaic dimeter",3.1905,0.9703,0.8,0.5354,0.3061,0.8476,0.6725,"won 't somebody come along with me ?
+ i won 't leave you alone
+ i 've been searching for you
+ don 't want you to know
+
+ at the end of the day
+ nobody knows where it 's gonna be
+ there 's nobody like you
+ who 'll turn around
+ nobody else but you
+ nobody but you
+ nobody but you
+
+ it 's been so long since i held you in my arms
+ ain 't gonna let you go
+ ain 't gonna let you go
+ ain 't gonna let you go
+ i ain 't gonna let you go
+ ain 't gonna let you go
+
+ i"
+"4.2-LM-108k-lines-genre-song_title","1.2","4","1543791024","country","the road i walk on",0.6044,0.8627,0.7059,0.8824,0.7059,"Trochaic dimeter",2.5263,1.0,0.7745,0.4455,0.24,0.8061,0.6216,"the road i walk on
+ i walk with my head in my hands
+ and i walk and i walk
+ i walk with my head held up high
+
+ i walk with my head in my hands
+ i walk with my feet on the ground
+ i walk with my feet on the ground
+ walk with my feet back on the ground
+ walk with my feet , walk with my feet
+ walk with my feet
+ walk with my feet
+ walk with my feet
+ walk with my feet
+ walk with my feet
+ walk with my feet
+ walk with my feet
+ walk with my feet
+ walk with my feet "
+"4.2-LM-108k-lines-genre-song_title","1.2","5","1543791032","nan","world war iii",0.7039,0.6566,0.5556,0.7576,0.6667,"Iambic dimeter",2.0909,1.0,0.7071,0.3571,0.1546,0.7391,0.538,"it 's a riot
+ it 's a riot
+ and you don 't know what you 're doing
+ it 's a riot
+ it 's a riot
+ and you don 't know what to do with it
+ it 's a scare
+
+ you don 't have to be scared
+ you don 't have to be afraid
+ you don 't have to be afraid
+
+ now that i 'm here
+ and i 'm here to say
+ i 'll be there
+ i 'll be there
+ i 'll be there
+ yes , i 'll be there
+ i 'll be there
+ i 'll be there
+
+ you know i 'll"
+"4.2-LM-108k-lines-genre-song_title","1.4","1","1543791040","classical","god winds gray ""come alive "" (2007 single remaster )",0.4537,0.1667,0.0,0.6944,0.4167,"Trochaic tetrameter",7.0714,0.9811,0.2857,0.0096,1.0,0.4268,0.2523,"pretty notes and and moments passing call
+ cabo for alone long 00s you til ' pablo 's run to sweep tryin ' to forgot the tire pinned
+
+ twee allah
+ lyric dried kid style
+ jumpin ' mayne
+ like so little while another guy flows the same
+ and me drivin faster gets easier every day slide behind us low quizã¡s (ahh) roosevelt 's calling  
+lou ancient messiah text focus on 1000 full might bible
+nick dig cement pandora treats him hard vers mold sings plays he abrigo it thin still jim effect lhe contigo
+still j
+fairly
+1 ter hustle 3x repeat partner sincerely
+   reggae rock  peeping caroline  i railroad won"
+"4.2-LM-108k-lines-genre-song_title","1.4","2","1543791043","garage rock","haunting room (2006 remastered lp version )",0.5923,0.3786,0.1538,0.7379,0.3846,"Iambic trimeter",3.875,1.0,0.8039,0.3861,0.17,0.781,0.573,"wake up in a dandy place
+ they can sit and watch you hesitate
+
+ now you 're a ritual clown
+ workin ' in a magic chase
+ you love her endlessly
+ a bullet in your brain
+ won 't you make it with as easy as it seems
+ when out of sight comes down ?
+ you just fall down , girl , if you try to get out of here
+ johnson : tell me what i 'm not here and i 'll search your life
+ (oooh)
+
+ life ain 't too pretty for girls and boys
+ ain 't no freak in y 'all and if its not too late
+ smoke out of"
+"4.2-LM-108k-lines-genre-song_title","1.4","3","1543791052","emo pop","days",0.5789,0.6186,0.4375,0.8041,0.625,"Trochaic trimeter",3.3684,1.0,0.8969,0.5417,0.2211,0.8715,0.6526,"you think that you 've changed everything
+ but baby , you 've changed everything
+ oh , you
+ oh , you 've changed
+ but not so cool that i don 't know when to stop
+ baby , you 've got what i need
+ ooh , i got what you need
+ you got what i need
+ i 'm gonna set you free
+ i wanna breathe
+ ooh , so don 't you let me be
+ gotta let you in
+
+ oh , i wanna be
+ all i wanna be
+ oh , in a state of loneliness
+ oh , here i go
+
+ but there 's not one thing i need to know "
+"4.2-LM-108k-lines-genre-song_title","1.4","4","1543791060","indie pop","stand and fight",0.5508,0.5816,0.4706,0.8265,0.7059,"Iambic trimeter",3.2273,1.0,0.8163,0.4124,0.1771,0.7953,0.584,"i have seen your face
+ in the depths of this space
+ yeah , i have seen your face before
+
+ and it 's alright
+ and it 's alright
+ and it 's alright
+ you know that you 're real
+ and it 's alright
+ you know that it 's alright
+ it 's alright
+
+ every time i see your face
+ i think of you again and again
+ it 's easy when it 's easy
+ when it 's easy to see
+
+ i feel i 'm lost without a friend
+ i 'm all covered with ice
+ i don 't need anyone
+ if i come home tonight
+"
+"4.2-LM-108k-lines-genre-song_title","1.4","5","1543791069","nan","take my hand (remastered album version )",0.6506,0.5532,0.5294,0.7447,0.6471,"Iambic dimeter",2.8182,1.0,0.9043,0.6344,0.3043,0.9183,0.7203,"take my hand
+ take my hand
+ take my hand
+ take my hand
+ take my hand
+ don 't let me go
+ take my hand
+ don 't let me go
+
+ there is no place that i would rather be
+ when you 're right here by me
+
+ if you 'd like to know if you 'll be there
+ when you 're feeling down
+ and i don 't want you around
+
+ come to me , i 'll lay me down
+ to the place i belong
+ i 've got to find a way
+ to take you home
+
+ can 't be wrong "
