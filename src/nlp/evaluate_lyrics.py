@@ -54,7 +54,7 @@ class Evaluator(DeepLyric):
         if not metrics_dict:
             self._metrics[key] = value
         else:
-            self._metrics = config_dict
+            self._metrics = metrics_dict
     
     def _get_lyric(self):
         """
