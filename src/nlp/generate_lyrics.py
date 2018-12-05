@@ -89,6 +89,21 @@ class DeepLyric:
             self._config[key] = value
         else:
             self._config = config_dict
+            
+    def _set_genre(self):
+        """
+        Creates config param `seed_text_w_genre`
+        Genre is a special case because we pass it as part of the seed text
+        """
+        pass
+        
+    def _set_title(self):
+        """
+        Creates config param `seed_text_w_title`
+        We assume genre is required in order to pass title but not vice versa
+            (In future version we will decouple these two)
+        """
+        pass
     
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
@@ -267,7 +282,7 @@ class DeepLyric:
             Returns a sorted list of the entire tree search of contexts and their respective scores in the form:
             [[context, score], [context, score], ..., [context, score]]
         """
-        # get params from config
+        ####### get params from config ############################
         seed_text = self.get_config('seed_text')
         max_len = self.get_config('max_len')
         GPU = self.get_config('GPU')
@@ -277,6 +292,7 @@ class DeepLyric:
         temperature = self.get_config('temperature')
         top_k = self.get_config('top_k')
         audio = self.get_config('audio')
+        ###########################################################
         
         if isinstance(seed_text, str):
             seed_text = self.tokenize(seed_text)
