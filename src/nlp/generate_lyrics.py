@@ -73,7 +73,7 @@ class DeepLyric:
             If None the model name will be missing in the metadata output
         """
         # initialize config dictionary to default
-        self.set_config(config_dict=self.DEFAULT_CONFIG)
+        self.set_config(config_dict=copy(self.DEFAULT_CONFIG))
         self.set_config('model_name', model_name)
         self.model_type = model_type
         self.set_config('model_type', model_type)
