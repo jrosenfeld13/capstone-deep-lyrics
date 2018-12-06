@@ -11,6 +11,10 @@ import string
 import pronouncing
 import copy
 
+import json
+from datetime import datetime
+import requests
+
 from copy import copy, deepcopy
 from enum import Enum
 
@@ -26,22 +30,72 @@ class Evaluator(DeepLyric):
         - lyric comparison - e.g. BLEU, etc.
         
     """
+    INIT_METRICS = {
+        'BLEU_1_excl_Unsmoothed': None,
+        'BLEU_2_excl_Unsmoothed': None,
+        'BLEU_3_excl_Unsmoothed': None,
+        'BLEU_4_excl_Unsmoothed': None,
+        'BLEU_3_cumul_Smoothed': None,
+        'BLEU_4_cumul_Smoothed': None,
+        'POS_confirmity': None,
+        'rhymeDensityAP': None,
+        'rhymeDensityAV': None,
+        'rhymeDensityEP': None,
+        'rhymeDensityEV': None,
+        'closestMeters': None,
+        'editsPerLine': None
+    }
     
-    def __init__(self, deep_lyric):
+
+    
+    AVAILABLE_METRICS = ['BLEU_1_excl_Unsmoothed'
+                         ,'BLEU_2_excl_Unsmoothed'
+                         ,'BLEU_3_excl_Unsmoothed'
+                         ,'BLEU_4_excl_Unsmoothed'
+                         ,'BLEU_3_cumul_Smoothed'
+                         ,'BLEU_4_cumul_Smoothed'
+                         ,'POS_confirmity'
+                         ,'rhymeDensityAP'
+                         ,'rhymeDensityAV'
+                         ,'rhymeDensityEP'
+                         ,'rhymeDensityEV'
+                         ,'closestMeters'
+                         ,'editsPerLine']
+    
+    def __init__(self, deep_lyric, set_lyric_state=True):
         """`DeepLyric` object stores all hyperparameters and configs"""
         self.deep_lyric = deep_lyric
-        self.generated_song = None
-    
+        self.set_metric(metrics_dict=copy(self.INIT_METRICS))
+        
+        if set_lyric_state:
+            self.get_lyric()
+        
     @property
     def metrics(self):
         return self._metrics
         
-    def set_metric(self, key, value):
-        pass
-    
-    def _get_lyric(self):
+    def set_metric(self, key=None, value=None, metrics_dict=None):
         """
-        Generates one song with given hyperparamters
+        Set evaluation metric and its corresponding value
+        
+        Parameters:
+        -----------
+        key : str
+            metric key, e.g. rhyme_density, pos, etc.
+        value : str
+            metric value
+        config_dict : dict
+            dictionary of {`key`: `value`} for passing in default metrics
+        """
+        if not metrics_dict:
+            self._metrics[key] = value
+        else:
+            self._metrics = metrics_dict
+    
+    def get_lyric(self):
+        """
+        Generates one song with given hyperparamters and updates state
+        `self.generated_song`
         
         Returns:
         --------
@@ -50,21 +104,21 @@ class Evaluator(DeepLyric):
         """
         self.deep_lyric.generate_text()
         song_idx = self.deep_lyric.best_song
-        song = [self.deep_lyric.get_word_from_index(w) for w in song_idx]
-        return song
+        self.generated_song = [self.deep_lyric.get_word_from_index(w) for w in song_idx]
+
         
-    def _get_lyrics(self, n):
-        """
-        Generates a batch of songs of size `n`
-        
-        Returns:
-        list (self.best_song) : list( list (`str`) )
-        """
-        songs = []
-        for i in range(n):
-            songs.append(self.get_lyric())
-            
-        return songs
+    # def _get_lyrics(self, n):
+    #     """
+    #     Generates a batch of songs of size `n`
+    #
+    #     Returns:
+    #     list (self.best_song) : list( list (`str`) )
+    #     """
+    #     songs = []
+    #     for i in range(n):
+    #         songs.append(self.get_lyric())
+    #
+    #     return songs
     
     def _remove_markup_and_punc(self,token_list):
         """
@@ -88,8 +142,6 @@ class Evaluator(DeepLyric):
                             and token not in [c for c in string.punctuation if c not in ("'")]] 
         return clean_token_list
 
-    
-    
     def _bleu(self,ref_list,candidate_token_list,nGram=4,nGramType='cumulative',shouldSmooth=True):
         '''calculates BLEU score 
 
@@ -144,6 +196,8 @@ class Evaluator(DeepLyric):
         score = bleu_score.corpus_bleu(references, candidate, weights, smoothing_function=smoother)
         return score
     
+        
+        
 
     def _levenshtein(self, s1, s2):
         '''calculate levenshtein distance for two input strings
@@ -238,6 +292,13 @@ class Evaluator(DeepLyric):
     
         """
         
+        try:
+            self.generated_song
+        except AttributeError as e:
+            print(f"{e} : first generate song using `set_lyric_state=True`")
+            raise   
+        
+        
         # define lookups
         mapping = {'CC':'CC','DT':'DT','PDT':'DT','WDT':'DT','IN':'IN','JJ':'JJ','JJR':'JJ','JJS':'JJ'
                    ,'NN':'NN','NNS':'NN','NNP':'NN','NNPS':'NN','LS':'OT','CD':'OT','EX':'OT','FW':'OT'
@@ -295,10 +356,12 @@ class Evaluator(DeepLyric):
             'rhymeDensityEV': rhyme density using end words, vowel rhymes only
                            
         """
-        ##generated_song = self._get_lyric()
-        
-        ### Am assuming self.generated_song is the list of tokens in the song
-        
+        try:
+            self.generated_song
+        except AttributeError as e:
+            print(f"{e} : first generate song using `set_lyric_state=True`")
+            raise   
+            
         # initialize
         rhymePart_cnt_EP = Counter()
         rhymePart_cnt_EV = Counter()
@@ -371,7 +434,7 @@ class Evaluator(DeepLyric):
         self.set_metric('rhymeDensityAV', rhymeDensityAV)
         self.set_metric('rhymeDensityEP', rhymeDensityEP)
         self.set_metric('rhymeDensityEV', rhymeDensityEV)
-    
+ 
     
     def get_bleu(self,reference_dir='../data/lyrics/reference/',candidate_token_list,nGram=4,nGramType='cumulative',shouldSmooth=True,max_refs=None)):
         '''
@@ -424,13 +487,12 @@ class Evaluator(DeepLyric):
                 ref_list.append(ref_raw_text)
 
         # use set_metric
-        self.set_metric('BLEU_1_excl_Unsmoothed', bleu(ref_list, self.generated_song, nGram=1, nGramType='exclusive', shouldSmooth=False, max_refs=1000)
-        self.set_metric('BLEU_2_excl_Unsmoothed', bleu(ref_list, self.generated_song, nGram=2,nGramType='exclusive', shouldSmooth=False, max_refs=1000)
-        self.set_metric('BLEU_3_excl_Unsmoothed', bleu(ref_list, self.generated_song, nGram=3, nGramType='exclusive', shouldSmooth=False, max_refs=1000)
-        self.set_metric('BLEU_4_excl_Unsmoothed', bleu(ref_list, self.generated_song, nGram=4, nGramType='exclusive', shouldSmooth=False, max_refs=1000)
-        self.set_metric('BLEU_3_cumul_Smoothed', bleu(ref_list, self.generated_song, nGram=3, nGramType='cumulative', shouldSmooth=True, max_refs=1000)
-        self.set_metric('BLEU_4_cumul_Smoothed', bleu(ref_list, self.generated_song, nGram=4, nGramType='cumulative', shouldSmooth=True, max_refs=1000)
-        
+        self.set_metric('BLEU_1_excl_Unsmoothed', bleu(ref_list,self.generated_song,nGram=1,nGramType='exclusive',shouldSmooth=False,max_refs=1000)
+        self.set_metric('BLEU_2_excl_Unsmoothed', bleu(ref_list,self.generated_song,nGram=2,nGramType='exclusive',shouldSmooth=False,max_refs=1000)
+        self.set_metric('BLEU_3_excl_Unsmoothed', bleu(ref_list,self.generated_song,nGram=3,nGramType='exclusive',shouldSmooth=False,max_refs=1000)
+        self.set_metric('BLEU_4_excl_Unsmoothed', bleu(ref_list,self.generated_song,nGram=4,nGramType='exclusive',shouldSmooth=False,max_refs=1000)
+        self.set_metric('BLEU_3_cumul_Smoothed', bleu(ref_list,self.generated_song,nGram=3,nGramType='cumulative',shouldSmooth=True,max_refs=1000)
+        self.set_metric('BLEU_4_cumul_Smoothed', bleu(ref_list,self.generated_song,nGram=4,nGramType='cumulative',shouldSmooth=True,max_refs=1000)
         
         
         
@@ -448,6 +510,14 @@ class Evaluator(DeepLyric):
             edits_per_line: average lowest edit distance per line for any standard accentual-syllabic verse
             options: list of potential meters for the lowest edit distance
         '''
+        
+        try:
+            self.generated_song
+        except AttributeError as e:
+            print(f"{e} : first generate song using `set_lyric_state=True`")
+            raise   
+        
+        
         # define
         meter_dict = {'0101':'Iambic dimeter'
                       ,'010101':'Iambic trimeter'
@@ -510,10 +580,13 @@ class Evaluator(DeepLyric):
         self.get_POS_conformity()
         self.findMeter()
         self.get_bleu()
+
+        
     
     def save_json(self, dir=None, name=None, out=False):
         """
-        Saves generated lyric and `self.config` to json file in `dir`
+        Saves `self.deep_lyric.cofig`, `self.metrics`, and `self.generated_song`
+        to JSON
         
         Parameters
         ----------
@@ -527,9 +600,9 @@ class Evaluator(DeepLyric):
         Saves to file json of the following schema
         
         {
-            meta : `self.config`,
+            meta : `self.deep_lyrics.config`,
             lyric : ['these', 'are', 'lyric', 'tokens'],
-            metric : `self.metrics`
+            metrics : `self.metrics`
         }
         """
         
@@ -537,14 +610,14 @@ class Evaluator(DeepLyric):
             name = str(round(datetime.timestamp(datetime.utcnow())))
             
         try:
-            self.best_song
+            self.generated_song
         except AttributeError as e:
-            print(f"{e} : first generate song using generate_text()")
+            print(f"{e} : first generate song using `set_lyric_state=True`")
             raise
         
-        song_idx = self.best_song
-        song = [self.get_word_from_index(w) for w in song_idx]
-        payload = {'meta': self.config, 'lyric': song}
+        payload = {'meta': self.deep_lyric.config,
+                   'lyric': self.generated_song,
+                   'metrics': self.metrics}
         
         if dir:
             full_path = f"{dir}/{name}"
@@ -554,3 +627,20 @@ class Evaluator(DeepLyric):
         if out:
             return payload
             
+    def batch_analysis(n):
+        """
+        Iterates lyrics and metrics and exports to desired `out` type.
+        We don't update states with this function
+        
+        Parameters:
+        -----------
+        n : int
+            number of examples to run evaluation on
+            
+        Returns:
+        --------
+        csv : 
+        """
+        pass
+        
+        
