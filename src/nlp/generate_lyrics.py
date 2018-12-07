@@ -231,7 +231,7 @@ class DeepLyric:
             if word == 'xeol':
                 word = '\n'
             elif word == 'xbol-1':
-                print('\n')
+                word = '\n'
             elif 'xbol' in word:
                 continue
             elif word =='xbos':
