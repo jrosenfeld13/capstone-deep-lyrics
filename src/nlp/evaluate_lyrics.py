@@ -142,7 +142,7 @@ class Evaluator(DeepLyric):
                             and token not in [c for c in string.punctuation if c not in ("'")]] 
         return clean_token_list
 
-    def _bleu(self,ref_list,candidate_token_list,nGram=4,nGramType='cumulative',shouldSmooth=True):
+    def _bleu(self,candidate_token_list,ref_list,nGram=4,nGramType='cumulative',shouldSmooth=True):
         '''calculates BLEU score 
 
             Parameters
@@ -182,9 +182,9 @@ class Evaluator(DeepLyric):
         
         
         
-        candidate = [[token for token in _remove_markup_and_punc(candidate_token_list) if token <> 'xeol']]
+        candidate = [[token for token in _remove_markup_and_punc(candidate_token_list) if token != 'xeol']]
         
-        references = [[[token for token in _remove_markup_and_punc(ref) if token <> 'xeol'] for ref in ref_list]]
+        references = [[[token for token in _remove_markup_and_punc(ref) if token != 'xeol'] for ref in ref_list]]
         weights = weight_dict[(nGramType,nGram)]
 
 
@@ -316,7 +316,7 @@ class Evaluator(DeepLyric):
         absdiff = 0
 
         # prepare data  
-        tokenized_text = [token for token in _remove_markup_and_punc(self.generated_song) if token <> 'xeol']
+        tokenized_text = [token for token in _remove_markup_and_punc(self.generated_song) if token != 'xeol']
         tag_list = nltk.pos_tag(tokenized_text)
 
         # initial proportions
@@ -436,7 +436,12 @@ class Evaluator(DeepLyric):
         self.set_metric('rhymeDensityEV', rhymeDensityEV)
  
     
-    def get_bleu(self,reference_dir='../data/lyrics/reference/',candidate_token_list,nGram=4,nGramType='cumulative',shouldSmooth=True,max_refs=None)):
+    def get_bleu(self,candidate_token_list
+                 ,reference_dir='../data/lyrics/reference/'
+                 ,nGram=4
+                 ,nGramType='cumulative'
+                 ,shouldSmooth=True
+                 ,max_refs=None):
         '''
         Calculates BLEU score for nGrams 1-4 and smoothed cumulative for nGram in (3,4).
         
@@ -487,12 +492,18 @@ class Evaluator(DeepLyric):
                 ref_list.append(ref_raw_text)
 
         # use set_metric
-        self.set_metric('BLEU_1_excl_Unsmoothed', bleu(ref_list,self.generated_song,nGram=1,nGramType='exclusive',shouldSmooth=False,max_refs=1000)
-        self.set_metric('BLEU_2_excl_Unsmoothed', bleu(ref_list,self.generated_song,nGram=2,nGramType='exclusive',shouldSmooth=False,max_refs=1000)
-        self.set_metric('BLEU_3_excl_Unsmoothed', bleu(ref_list,self.generated_song,nGram=3,nGramType='exclusive',shouldSmooth=False,max_refs=1000)
-        self.set_metric('BLEU_4_excl_Unsmoothed', bleu(ref_list,self.generated_song,nGram=4,nGramType='exclusive',shouldSmooth=False,max_refs=1000)
-        self.set_metric('BLEU_3_cumul_Smoothed', bleu(ref_list,self.generated_song,nGram=3,nGramType='cumulative',shouldSmooth=True,max_refs=1000)
-        self.set_metric('BLEU_4_cumul_Smoothed', bleu(ref_list,self.generated_song,nGram=4,nGramType='cumulative',shouldSmooth=True,max_refs=1000)
+        self.set_metric('BLEU_1_excl_Unsmoothed'
+                        , bleu(self.generated_song, ref_list, nGram=1, nGramType='exclusive', shouldSmooth=False, max_refs=1000 )
+        self.set_metric('BLEU_2_excl_Unsmoothed'
+                        , bleu(self.generated_song, ref_list, nGram=2, nGramType='exclusive', shouldSmooth=False, max_refs=1000)
+        self.set_metric('BLEU_3_excl_Unsmoothed'
+                        , bleu(self.generated_song, ref_list, nGram=3, nGramType='exclusive', shouldSmooth=False, max_refs=1000)
+        self.set_metric('BLEU_4_excl_Unsmoothed'
+                        , bleu(self.generated_song, ref_list, nGram=4, nGramType='exclusive', shouldSmooth=False, max_refs=1000)
+        self.set_metric('BLEU_3_cumul_Smoothed'
+                        , bleu(self.generated_song, ref_list, nGram=3, nGramType='cumulative', shouldSmooth=True, max_refs=1000)
+        self.set_metric('BLEU_4_cumul_Smoothed'
+                        , bleu(self.generated_song, ref_list, nGram=4, nGramType='cumulative', shouldSmooth=True, max_refs=1000)
         
         
         
