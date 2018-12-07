@@ -137,7 +137,7 @@ class DeepLyric:
         elif self.get_config('title'):
             title = self.get_config('title')
             seed = self.get_config('seed_text')
-            init_context = f'xtitle {title}'
+            init_context = f'xbos xgenre nan xtitle {title}'
         else:
             init_context = self.get_config('seed_text')
             
@@ -231,7 +231,7 @@ class DeepLyric:
             if word == 'xeol':
                 word = '\n'
             elif word == 'xbol-1':
-                word = '\n'
+                word = '\n\n'
             elif 'xbol' in word:
                 continue
             elif word =='xbos':
