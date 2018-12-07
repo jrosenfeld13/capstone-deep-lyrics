@@ -144,8 +144,13 @@ class DeepLyric:
         return init_context
     
     def numericalize(self, t):
-        "Convert a list of tokens `t` to their ids."
-        return [self.stoi[w] for w in t]
+        """
+        Convert a list of tokens `t` to their ids.
+        
+        If token is not in the vocab, returns 0
+        *Note:* we assume that 'xxunk' -> 0 index in itos
+        """
+        return [self.stoi.get(w.lower(), 0) for w in t]
 
     def textify(self, nums, sep=' '):
         "Convert a list of `nums` to their tokens."
