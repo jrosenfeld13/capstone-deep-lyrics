@@ -19,7 +19,7 @@ from copy import copy, deepcopy
 from enum import Enum
 
 from .generate_lyrics import DeepLyric
-from .evaluation_methods import parse_tokens, calculate_rhyme_density
+from .evaluation_methods import parse_tokens, calculate_rhyme_density, bleu, findMeter, get_POS_conformity
 
 def get_bleu_reference():
     """
