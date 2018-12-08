@@ -363,8 +363,11 @@ def findMeter(tokens):
                 if dist < minDist:
                     minDist = dist
             vote_cnt[v] += minDist
-
-    lowest = min(vote_cnt.values())
+    
+    try:
+        lowest = min(vote_cnt.values())
+    except ValueError:
+        return None, None
     options = [k for k,v in vote_cnt.items() if v==lowest]
     
     # use set_metric
