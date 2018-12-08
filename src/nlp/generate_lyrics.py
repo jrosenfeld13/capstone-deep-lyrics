@@ -34,6 +34,16 @@ def get_itos(model_name):
     itos = pickle.loads(itos)
     return itos
 
+def get_preprocessor(model_name):
+    """
+    Retrieve preprocessor from google cloud storage
+    """
+    preprocessor_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_preprocessor.pkl'
+    preprocessor = requests.get(preprocessor_url)
+    preprocessor = preprocessor.content
+    preprocessor = pickle.loads(preprocessor)
+    return preprocessor
+
 class DeepLyric:
     """
     Generate deep lyrics given model and weights
@@ -85,6 +95,8 @@ class DeepLyric:
         self.set_config(config_dict=copy(self.DEFAULT_CONFIG))
         self.set_config('model_name', model_name)
         self.model_type = model_type
+        if self.model_type == 'multimodal':
+            self.preprocessor = get_preprocessor(model)
         self.set_config('model_type', model_type)
         
         if isinstance(model, str):
@@ -152,7 +164,7 @@ class DeepLyric:
     
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
-        return [self.stoi[w] for w in t]
+        return [self.stoi.get(w, 0) for w in t]
 
     def textify(self, nums, sep=' '):
         "Convert a list of `nums` to their tokens."
@@ -170,6 +182,7 @@ class DeepLyric:
         re_tk = nltk.tokenize.RegexpTokenizer(r'\[[^\]]+\]|\w+|[\d\.,]+|\S+',
                                               discard_empty=False)
         context = re_tk.tokenize_sents(context)[0]
+        context = [word.lower() for word in context]
         return context
     
     def save_json(self, dir=None, name=None, out=False, format_lyrics=False):
