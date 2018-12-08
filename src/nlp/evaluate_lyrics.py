@@ -56,6 +56,7 @@ class Evaluator(DeepLyric):
         'BLEU_4_cumul_Smoothed': None,
         'closestMeters': None,
         'editsPerLine': None,
+        'POS_conformity': None
     }
         
     # AVAILABLE_METRICS = ['list', 'of', 'metrics']
@@ -186,7 +187,7 @@ class Evaluator(DeepLyric):
         self.set_metric('editsPerLine', editsPerLine)
         
         # POS conformity
-        self.set_metric('POS_confirmity',
+        self.set_metric('POS_conformity',
                         get_POS_conformity(self.generated_song))
                 
         if out:
