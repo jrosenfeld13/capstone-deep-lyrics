@@ -138,7 +138,8 @@ def calculate_rhyme_density(tokens, rhymeType='perfect', rhymeLocation='all'):
         tokens = parse_tokens(tokens, lines=False, tags=False)
         
     elif rhymeLocation == 'end':
-        tokens = [line[-1] for line in parse_tokens(tokens, lines=True, tags=False)]
+        tokens = [line[-1] for line in parse_tokens(tokens, lines=True, tags=False)\
+                  if line]
         
     # only retrieve first pronunciation from `phones_for_words`
     # we can enhance here by doing permutations of pronunciations
