@@ -9,7 +9,6 @@ from collections import Counter
 from collections import defaultdict
 import string
 import pronouncing
-import copy
 
 import json
 from datetime import datetime
@@ -255,7 +254,7 @@ def findLineStress(tokenized_line):
         pros = pronouncing.phones_for_word(word)
         if pros:
             for phonelist in [pronouncing.phones_for_word(word)]:
-                stressOptions = copy.deepcopy(parses)
+                stressOptions = deepcopy(parses)
                 currLen = len(parses)
                 newparse = []
                 # I don't really need to loop through pronunciations
