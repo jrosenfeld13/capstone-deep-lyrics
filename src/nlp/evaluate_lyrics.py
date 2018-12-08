@@ -28,7 +28,7 @@ def get_bleu_reference():
     REFERENCE_URL = 'https://storage.googleapis.com/w210-capstone/lyrics/reference/4.1-LM-108k-lines-validation-tokens_100.pkl'
     ref = requests.get(REFERENCE_URL)
     ref = ref.content
-    ref = pickle.load(ref)
+    ref = pickle.loads(ref)
     return ref
 
 class Evaluator(DeepLyric):
