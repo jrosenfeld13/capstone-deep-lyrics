@@ -21,6 +21,16 @@ from enum import Enum
 from .generate_lyrics import DeepLyric
 from .evaluation_methods import parse_tokens, calculate_rhyme_density
 
+def get_bleu_reference():
+    """
+    Retrieve preprocessor from google cloud storage
+    """
+    REFERENCE_URL = 'https://storage.googleapis.com/w210-capstone/lyrics/reference/4.1-LM-108k-lines-validation-tokens_100.pkl'
+    ref = requests.get(REFERENCE_URL)
+    ref = preprocessor.content
+    ref = pickle.load(REFERENCE_URL)
+    return ref
+
 class Evaluator(DeepLyric):
     """
     Evaluates model and generated lyrics of DeepLyric instance
@@ -37,7 +47,15 @@ class Evaluator(DeepLyric):
         'rhymeDensityAS': None,
         'rhymeDensityEP': None,
         'rhymeDensityEV': None,
-        'rhymeDensityES': None
+        'rhymeDensityES': None,
+        'BLEU_1_excl_Unsmoothed': None,
+        'BLEU_2_excl_Unsmoothed': None,
+        'BLEU_3_excl_Unsmoothed': None,
+        'BLEU_4_excl_Unsmoothed': None,
+        'BLEU_3_cumul_Smoothed': None,
+        'BLEU_4_cumul_Smoothed': None,
+        'closestMeters': None,
+        'editsPerLine': None,
     }
         
     # AVAILABLE_METRICS = ['list', 'of', 'metrics']
@@ -46,6 +64,8 @@ class Evaluator(DeepLyric):
         """`DeepLyric` object stores all hyperparameters and configs"""
         self.deep_lyric = deep_lyric
         self.set_metric(metrics_dict=copy(self.INIT_METRICS))
+        
+        self.bleu_ref = get_bleu_reference()
         
         if set_lyric_state:
             self.get_lyric()
@@ -99,6 +119,12 @@ class Evaluator(DeepLyric):
         'rhymeDensityEP': rhyme density using end words, perfect rhymes only
         'rhymeDensityEV': rhyme density using end words, all vowel rhymes
         'rhymeDensityES': rhyme density using end words, all vowel rhymes
+        'BLEU_1_excl_Unsmoothed'
+        'BLEU_2_excl_Unsmoothed'
+        'BLEU_3_excl_Unsmoothed'
+        'BLEU_4_excl_Unsmoothed'
+        'BLEU_3_cumul_Smoothed'
+        'BLEU_4_cumul_Smoothed'
         """
         try:
             self.generated_song
@@ -106,6 +132,7 @@ class Evaluator(DeepLyric):
             print(f"{e} : first generate song using `set_lyric_state=True`")
             raise
         
+        # rhyme density
         rhymeDensityAP = calculate_rhyme_density(self.generated_song,
                                                  rhymeType='perfect',
                                                  rhymeLocation='all')
@@ -132,6 +159,36 @@ class Evaluator(DeepLyric):
         self.set_metric('rhymeDensityEV', rhymeDensityEV)
         self.set_metric('rhymeDensityES', rhymeDensityES)
         
+        # BLEU
+        # use set_metric
+        self.set_metric('BLEU_1_excl_Unsmoothed',
+                        bleu(self.generated_song, self.bleu_ref,
+                        nGram=1, nGramType='exclusive', shouldSmooth=False)
+        self.set_metric('BLEU_2_excl_Unsmoothed',
+                        bleu(self.generated_song, self.bleu_ref,
+                        nGram=2, nGramType='exclusive', shouldSmooth=False)
+        self.set_metric('BLEU_3_excl_Unsmoothed',
+                        bleu(self.generated_song, self.bleu_ref,
+                        nGram=3, nGramType='exclusive', shouldSmooth=False)
+        self.set_metric('BLEU_4_excl_Unsmoothed',
+                        bleu(self.generated_song, self.bleu_ref,
+                        nGram=4, nGramType='exclusive', shouldSmooth=False)
+        self.set_metric('BLEU_3_cumul_Smoothed',
+                        bleu(self.generated_song, self.bleu_ref,
+                        nGram=3, nGramType='cumulative', shouldSmooth=True)
+        self.set_metric('BLEU_4_cumul_Smoothed',
+                        bleu(self.generated_song, self.bleu_ref,
+                        nGram=4, nGramType='cumulative', shouldSmooth=True)
+        
+        # Meter
+        closestMeters, editsPerLine = findMeter(self.generated_song)
+        self.set_metric('closestMeters', closestMeters)
+        self.set_metric('editsPerLine', editsPerLine)
+        
+        # POS conformity
+        self.set_metric('POS_confirmity',
+                        get_POS_conformity(self.generated_song))
+                
         if out:
             return self.metrics
 
