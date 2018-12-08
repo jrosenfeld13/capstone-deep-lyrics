@@ -10,11 +10,15 @@ from datetime import datetime
 import json
 import requests
 
-def get_model(model_name):
+def get_model(model_name, GPU=True):
     """
     Retrieve model from google cloud storage
     """
-    model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture.pkl'
+    if GPU:
+        model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture.pkl'
+    else:
+        model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture_cpu.pkl'
+    
     model = requests.get(model_url)
     model = model.content
     model = pickle.loads(model)
@@ -29,6 +33,16 @@ def get_itos(model_name):
     itos = itos.content
     itos = pickle.loads(itos)
     return itos
+
+def get_preprocessor(model_name):
+    """
+    Retrieve preprocessor from google cloud storage
+    """
+    preprocessor_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_preprocessor.pkl'
+    preprocessor = requests.get(preprocessor_url)
+    preprocessor = preprocessor.content
+    preprocessor = pickle.loads(preprocessor)
+    return preprocessor
 
 class DeepLyric:
     """
@@ -48,7 +62,7 @@ class DeepLyric:
         'genre': None,
         'title': None
     }
-    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None):
+    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None, GPU=True):
         """
         Parameters:
         -----------
@@ -73,16 +87,21 @@ class DeepLyric:
         model_name : str
             Optional model name if Torch model is directly loaded to `model`
             If None the model name will be missing in the metadata output
+            
+        GPU : bool
+            If machine has GPU or not
         """
         # initialize config dictionary to default
         self.set_config(config_dict=copy(self.DEFAULT_CONFIG))
         self.set_config('model_name', model_name)
         self.model_type = model_type
+        if self.model_type == 'multimodal':
+            self.preprocessor = get_preprocessor(model)
         self.set_config('model_type', model_type)
         
         if isinstance(model, str):
             self.set_config('model_name', model)
-            self.model = get_model(model)
+            self.model = get_model(model, GPU=GPU)
             self.itos = get_itos(model)
         else:
             self.model = model
@@ -144,13 +163,8 @@ class DeepLyric:
         return init_context
     
     def numericalize(self, t):
-        """
-        Convert a list of tokens `t` to their ids.
-        
-        If token is not in the vocab, returns 0
-        *Note:* we assume that 'xxunk' -> 0 index in itos
-        """
-        return [self.stoi.get(w.lower(), 0) for w in t]
+        "Convert a list of tokens `t` to their ids."
+        return [self.stoi.get(w, 0) for w in t]
 
     def textify(self, nums, sep=' '):
         "Convert a list of `nums` to their tokens."
@@ -168,6 +182,7 @@ class DeepLyric:
         re_tk = nltk.tokenize.RegexpTokenizer(r'\[[^\]]+\]|\w+|[\d\.,]+|\S+',
                                               discard_empty=False)
         context = re_tk.tokenize_sents(context)[0]
+        context = [word.lower() for word in context]
         return context
     
     def save_json(self, dir=None, name=None, out=False, format_lyrics=False):
@@ -215,7 +230,7 @@ class DeepLyric:
         if out:
             return payload
             
-    def pretty_format(self, context):
+    def pretty_format(self, context=[]):
         """
         Converts lyrics element of list into str with applied formatting
         
@@ -230,9 +245,15 @@ class DeepLyric:
         words : `str`
             Pretty formatted string
         """
+                
+        if not context:
+            context = self.best_song
         
-        words = []
-        for word in context:
+        output = []
+        for i in range(len(context)):
+            step = context[i]
+            word = self.textify([step])
+            
             if word == 'xeol':
                 word = '\n'
             elif word == 'xbol-1':
@@ -249,10 +270,9 @@ class DeepLyric:
                 word == 'SONG END'
                 break
                 
-            words.append(word)
+            output.append(word)
             
-        return ' '.join(words)
-            
+        return ' '.join(output)
 
     def print_lyrics(self, context=[]):
         """
@@ -308,7 +328,6 @@ class DeepLyric:
             audio features for a song. `n` should equal the size of the
             multimodal features in `model`
             
-
         Returns:
         ----------
         List of probabilities with length of vocab size
@@ -366,7 +385,6 @@ class DeepLyric:
         ----------
         seed_text : list or str
             List of strings where each item is a token. (e.g. ['the', 'cat']) or string that is split on white space
-
         max_len : int
             Number of words in generated sequence
             
@@ -478,7 +496,6 @@ class DeepLyric:
         ----------
         seed_text : list or str
             List of strings where each item is a token. (e.g. ['the', 'cat']) or string that is split on white space
-
         max_len : int
             Number of words in generated sequence
             

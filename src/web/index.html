@@ -25,6 +25,7 @@ body {font-size:16px;}
   <div class="w3-bar-block">
     <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a>
     <a href="#try" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Try it out!</a>
+    <a href="#works" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">How it works</a>
     <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Meet the team</a>
   </div>
 </nav>
@@ -61,7 +62,7 @@ body {font-size:16px;}
 
   <!-- Try -->
   <div class="w3-container" id="try" style="margin-top:75px">
-    <h1 class="w3-xxxlarge w3-text-red"><b>Try it out</b></h1>
+    <h1 class="w3-xxxlarge w3-text-red"><b>Try it out!</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p>Do you want to try our lyrics generator? Login to Spotify to choose a song and we'll generate lyrics from it, or generate a random lyric and we'll choose a song for you and show you how poetic deep learning can be!</p>
 
@@ -87,15 +88,26 @@ body {font-size:16px;}
         <div class="w3-light-grey">
           <div class="w3-container">
             <h3>Generated lyrics:</h3>
-            <p id="lyrics_p"></p>
+            <p id="lyrics_p" contenteditable="true"></p>
           </div>
         </div>
       </div>
   </div>
+
+    <!-- How it works -->
+  <div class="w3-container" id="works" style="margin-top:75px">
+    <h1 class="w3-xxxlarge w3-text-red"><b>How it works</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+    <p>Here's how we did it.</p>
+    <p>Lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor
+    incididunt ut labore et quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </p>
+  </div>
     
   <!-- The team -->
   <div class="w3-container" id="team" style="margin-top:75px">
-    <h1 class="w3-xxxlarge w3-text-red"><b>Meet the team!</b></h1>
+    <h1 class="w3-xxxlarge w3-text-red"><b>Meet the team</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p>The best team in the world.</p>
     <p>We are lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
@@ -245,7 +257,7 @@ function generateLyricsForSong(trackId, title, artistId) {
             const features = json.audio_features[0]
 
             // Call local server for lyric generation
-            const url = 'http://localhost:8080'
+            const url = 'http://localhost:8000'
             fetch(`${url}/lyrics`, {
                 method: 'POST',
                 headers: {
