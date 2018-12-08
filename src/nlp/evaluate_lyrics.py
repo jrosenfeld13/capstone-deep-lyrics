@@ -85,20 +85,6 @@ class Evaluator(DeepLyric):
         self.deep_lyric.generate_text()
         song_idx = self.deep_lyric.best_song
         self.generated_song = [self.deep_lyric.get_word_from_index(w) for w in song_idx]
-        
-    def get_rhyme_density(self, **kwargs):
-        """
-        Calculates Rhyme Density for generated lyric
-        """
-        try:
-            self.generated_song
-        except AttributeError as e:
-            print(f"{e} : first generate song using `set_lyric_state=True`")
-            raise
-            
-        return calculate_rhyme_density(self.generated_song,
-                                       rhymeType=rhymeType,
-                                       rhymeLocation=rhymeLocation)
 
     def evaluate(self, out=False):
         """
@@ -114,6 +100,11 @@ class Evaluator(DeepLyric):
         'rhymeDensityEV': rhyme density using end words, all vowel rhymes
         'rhymeDensityES': rhyme density using end words, all vowel rhymes
         """
+        try:
+            self.generated_song
+        except AttributeError as e:
+            print(f"{e} : first generate song using `set_lyric_state=True`")
+            raise
         
         rhymeDensityAP = calculate_rhyme_density(self.generated_song,
                                                  rhymeType='perfect',
