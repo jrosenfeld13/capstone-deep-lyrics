@@ -3,6 +3,7 @@ import six
 import json
 from pathlib import Path
 import pickle
+import os
 
 from swagger_server.models.lyrics_request import LyricsRequest  # noqa: E501
 from swagger_server import util
@@ -27,15 +28,18 @@ def generate_lyrics(body):  # noqa: E501
 
     ### LOAD MODEL AND CREATE DEEPLYRIC OBJECT
     #load from google cloudstore
-    deep_lyric = DeepLyric(MODEL, model_type='language', model_name=MODEL)
+    #deep_lyric = DeepLyric(MODEL, model_type='language', model_name=MODEL)
     
     #load from local (needs relative path workaround)
+    ARCHITCTURE_FILE = os.path.join(os.path.dirname(__file__), f'../../../../data/models/{MODEL}/models/{MODEL}_architecture.pkl')
+    ITOS_FILE = os.path.join(os.path.dirname(__file__), f'../../../../data/models/{MODEL}/tmp/itos.pkl')
+
     #MODEL_PATH = Path(f'../../../../data/models/{MODEL}')
-    #with open(MODEL_PATH/f'models/{MODEL}_architecture.pkl') as f:
-    #    architecture = pickle.loads(f)
-    #with open(MODEL_PATH/f'tmp/itos.pkl') as f:
-    #    itos = pickle.loads(f)
-    #deep_lyric = DeepLyric(architecture, itos, model_type='language')
+    with open(ARCHITCTURE_FILE, 'rb') as f:
+        architecture = pickle.load(f)
+    with open(ITOS_FILE, 'rb') as f:
+        itos = pickle.load(f)
+    deep_lyric = DeepLyric(architecture, itos, model_type='language')
     
     ### PARSE PARAMS FROM WEB
     #genre
@@ -46,7 +50,7 @@ def generate_lyrics(body):  # noqa: E501
     #title
     title = body['title']
     
-    deep_lyric.set_config('seed_text', f'xbos xgenre {genre} xtitle {title} xbol-1')
+    deep_lyric.set_config('seed_text', f'xbos xgenre {genre} xtitle {title}')
     deep_lyric.generate_text()
     
     #out = deep_lyric.save_json(out=True)
