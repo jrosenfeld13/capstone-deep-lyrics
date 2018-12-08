@@ -232,8 +232,7 @@ class DeepLyric:
         words : `str`
             Pretty formatted string
         """
-        
-        
+                
         if not context:
             context = self.best_song
         
@@ -261,7 +260,6 @@ class DeepLyric:
             output.append(word)
             
         return ' '.join(output)
-            
 
     def print_lyrics(self, context=[]):
         """
