@@ -10,11 +10,15 @@ from datetime import datetime
 import json
 import requests
 
-def get_model(model_name):
+def get_model(model_name, GPU=True):
     """
     Retrieve model from google cloud storage
     """
-    model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture.pkl'
+    if GPU:
+        model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture.pkl'
+    else:
+        model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture_cpu.pkl'
+    
     model = requests.get(model_url)
     model = model.content
     model = pickle.loads(model)
@@ -48,7 +52,7 @@ class DeepLyric:
         'genre': None,
         'title': None
     }
-    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None):
+    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None, GPU=True):
         """
         Parameters:
         -----------
@@ -73,6 +77,9 @@ class DeepLyric:
         model_name : str
             Optional model name if Torch model is directly loaded to `model`
             If None the model name will be missing in the metadata output
+            
+        GPU : bool
+            If machine has GPU or not
         """
         # initialize config dictionary to default
         self.set_config(config_dict=copy(self.DEFAULT_CONFIG))
@@ -82,7 +89,7 @@ class DeepLyric:
         
         if isinstance(model, str):
             self.set_config('model_name', model)
-            self.model = get_model(model)
+            self.model = get_model(model, GPU=GPU)
             self.itos = get_itos(model)
         else:
             self.model = model
@@ -210,7 +217,7 @@ class DeepLyric:
         if out:
             return payload
             
-    def pretty_format(self, context):
+    def pretty_format(self, context=[]):
         """
         Converts lyrics element of list into str with applied formatting
         
@@ -225,9 +232,15 @@ class DeepLyric:
         words : `str`
             Pretty formatted string
         """
+                
+        if not context:
+            context = self.best_song
         
-        words = []
-        for word in context:
+        output = []
+        for i in range(len(context)):
+            step = context[i]
+            word = self.textify([step])
+            
             if word == 'xeol':
                 word = '\n'
             elif word == 'xbol-1':
@@ -244,10 +257,9 @@ class DeepLyric:
                 word == 'SONG END'
                 break
                 
-            words.append(word)
+            output.append(word)
             
-        return ' '.join(words)
-            
+        return ' '.join(output)
 
     def print_lyrics(self, context=[]):
         """
@@ -303,7 +315,6 @@ class DeepLyric:
             audio features for a song. `n` should equal the size of the
             multimodal features in `model`
             
-
         Returns:
         ----------
         List of probabilities with length of vocab size
@@ -361,7 +372,6 @@ class DeepLyric:
         ----------
         seed_text : list or str
             List of strings where each item is a token. (e.g. ['the', 'cat']) or string that is split on white space
-
         max_len : int
             Number of words in generated sequence
             
@@ -473,7 +483,6 @@ class DeepLyric:
         ----------
         seed_text : list or str
             List of strings where each item is a token. (e.g. ['the', 'cat']) or string that is split on white space
-
         max_len : int
             Number of words in generated sequence
             
