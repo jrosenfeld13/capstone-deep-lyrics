@@ -164,22 +164,22 @@ class Evaluator(DeepLyric):
         # use set_metric
         self.set_metric('BLEU_1_excl_Unsmoothed',
                         bleu(self.generated_song, self.bleu_ref,
-                        nGram=1, nGramType='exclusive', shouldSmooth=False)
+                        nGram=1, nGramType='exclusive', shouldSmooth=False))
         self.set_metric('BLEU_2_excl_Unsmoothed',
                         bleu(self.generated_song, self.bleu_ref,
-                        nGram=2, nGramType='exclusive', shouldSmooth=False)
+                        nGram=2, nGramType='exclusive', shouldSmooth=False))
         self.set_metric('BLEU_3_excl_Unsmoothed',
                         bleu(self.generated_song, self.bleu_ref,
-                        nGram=3, nGramType='exclusive', shouldSmooth=False)
+                        nGram=3, nGramType='exclusive', shouldSmooth=False))
         self.set_metric('BLEU_4_excl_Unsmoothed',
                         bleu(self.generated_song, self.bleu_ref,
-                        nGram=4, nGramType='exclusive', shouldSmooth=False)
+                        nGram=4, nGramType='exclusive', shouldSmooth=False))
         self.set_metric('BLEU_3_cumul_Smoothed',
                         bleu(self.generated_song, self.bleu_ref,
-                        nGram=3, nGramType='cumulative', shouldSmooth=True)
+                        nGram=3, nGramType='cumulative', shouldSmooth=True))
         self.set_metric('BLEU_4_cumul_Smoothed',
                         bleu(self.generated_song, self.bleu_ref,
-                        nGram=4, nGramType='cumulative', shouldSmooth=True)
+                        nGram=4, nGramType='cumulative', shouldSmooth=True))
         
         # Meter
         closestMeters, editsPerLine = findMeter(self.generated_song)
