@@ -9,6 +9,7 @@ from enum import Enum
 from datetime import datetime
 import json
 import requests
+from pandas.io.json import json_normalize
 
 def get_model(model_name, GPU=True):
     """
@@ -62,7 +63,7 @@ class DeepLyric:
         'genre': None,
         'title': None
     }
-    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None, GPU=True):
+    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None, preprocessor=None, GPU=True):
         """
         Parameters:
         -----------
@@ -96,7 +97,7 @@ class DeepLyric:
         self.set_config('model_name', model_name)
         self.model_type = model_type
         if self.model_type == 'multimodal':
-            self.preprocessor = get_preprocessor(model)
+            self.preprocessor = preprocessor
         self.set_config('model_type', model_type)
         
         if isinstance(model, str):
@@ -182,6 +183,7 @@ class DeepLyric:
         re_tk = nltk.tokenize.RegexpTokenizer(r'\[[^\]]+\]|\w+|[\d\.,]+|\S+',
                                               discard_empty=False)
         context = re_tk.tokenize_sents(context)[0]
+
         context = [word.lower() for word in context]
         return context
     
@@ -347,16 +349,17 @@ class DeepLyric:
             result, *_ = self.model(context)
         
         elif self.model_type == 'multimodal':
-            assert len(audio.shape) == 2,"audio features must be a 1xn array"
-            audio_size = audio.shape[1]
+            audio_features = self.preprocessor.transform(audio).flatten()
+            #assert len(audio.shape) == 2,"audio features must be a 1xn array"
+            #audio_size = audio.shape[1]
             
-            if audio is None:
-                audio_features = Tensor([0]*audio_size*len(context))\
-                    .view(-1, 1, audio_size).cuda()
-            else:
-                audio_features = np.tile(audio, len(context))
-                audio_features = Tensor(audio_features)\
-                    .view(-1, 1, audio_size).cuda()
+            #if audio is None:
+            #    audio_features = Tensor([0]*audio_size*len(context))\
+            #        .view(-1, 1, audio_size).cuda()
+            #else:
+            #    audio_features = np.tile(audio, len(context))
+            #    audio_features = Tensor(audio_features)\
+            #        .view(-1, 1, audio_size).cuda()
             
             result, *_ = self.model(context, audio_features)
         
