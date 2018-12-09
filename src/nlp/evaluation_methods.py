@@ -17,7 +17,7 @@ import requests
 from copy import copy, deepcopy
 from enum import Enum
 
-def _combine_contraction(token_list, sign="'"):
+def combine_contraction(token_list, sign="'"):
     """
     combine sequent items in a list that compose a single contraction. By default look for apostrophe as signal
     
@@ -44,7 +44,7 @@ def _combine_contraction(token_list, sign="'"):
     return newList
 
 
-def parse_tokens(tokens, lines=True, tags=False):
+def parse_tokens(tokens, lines=True, tags=False, contraction=False):
     """
     Parses tokens with various options for evaluation methods.
     Assumes `xbol-1` tag as first line of actual lyrics.
@@ -64,6 +64,9 @@ def parse_tokens(tokens, lines=True, tags=False):
           
     """
     # lines and no tags
+    if contraction:
+        tokens = combine_contraction(tokens)
+    
     if lines and not tags:
         reached_bol = False
         parsed_tokens = []
@@ -161,10 +164,10 @@ def calculate_rhyme_density(tokens, rhymeType='perfect', rhymeLocation='all'):
     distinct_rhyme_cnt = 0
     
     if rhymeLocation == 'all':
-        tokens = parse_tokens(tokens, lines=False, tags=False)
+        tokens = parse_tokens(tokens, lines=False, tags=False, contraction=True)
         
     elif rhymeLocation == 'end':
-        tokens = [line[-1] for line in parse_tokens(tokens, lines=True, tags=False)\
+        tokens = [line[-1] for line in parse_tokens(tokens, lines=True, tags=False, contraction=True)\
                   if line]
         
     # only retrieve first pronunciation from `phones_for_words`
@@ -247,8 +250,8 @@ def bleu(tokens, ref_list, nGram=4, nGramType='cumulative', shouldSmooth=True):
                   ,('exclusive',3):(0,0,1,0)
                   ,('exclusive',4):(0,0,0,1)}
 
-    candidate = parse_tokens(tokens, lines=False, tags=False)
-    references = [parse_tokens(r, lines=False, tags=False) for r in ref_list]
+    candidate = parse_tokens(tokens, lines=False, tags=False, contraction=True)
+    references = [parse_tokens(r, lines=False, tags=False, contraction=True) for r in ref_list]
 
     weights = weight_dict[(nGramType,nGram)]
 
@@ -377,7 +380,7 @@ def findMeter(tokens):
     # initialize
     vote_cnt = Counter()
     
-    lines = parse_tokens(tokens, lines=True, tags=False)
+    lines = parse_tokens(tokens, lines=True, tags=False, contraction=True)
     line_cnt = len(lines)
     minDist = 999
 
@@ -419,7 +422,7 @@ def get_POS_conformity(tokens):
     absdiff = 0
 
     # prepare data
-    tokenized_text = parse_tokens(tokens, lines=False, tags=False)
+    tokenized_text = parse_tokens(tokens, lines=False, tags=False, contraction=False)
     tag_list = nltk.pos_tag(tokenized_text)
 
     # initial proportions
