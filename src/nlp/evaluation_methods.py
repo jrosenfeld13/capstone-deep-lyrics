@@ -17,6 +17,33 @@ import requests
 from copy import copy, deepcopy
 from enum import Enum
 
+def _combine_contraction(token_list, sign="'"):
+    """
+    combine sequent items in a list that compose a single contraction. By default look for apostrophe as signal
+    
+    Input Example:
+    --------------
+    ['xbos', 'xgenre', 'death', 'metal', 'xtitle', 'and', 'i', 'don', "'t",
+     'think', 'that', 'xbol-1', 'today', 'is', 'the', 'greatest', 'day', 'ever', 'xeol',
+     'xbol-2', 'so', 'what', 'never', 'xeol', 'xeos']
+     
+    Output Example:
+    ---------------
+    ['xbos', 'xgenre', 'death', 'metal', 'xtitle', 'and', 'i', "don't",
+     'think', 'that', 'xbol-1', 'today', 'is', 'the', 'greatest', 'day', 'ever', 'xeol',
+     'xbol-2', 'so', 'what', 'never', 'xeol', 'xeos']
+    
+    """
+    newList= []
+    for token in token_list:
+        if not token.startswith(sign):
+            newList.append(token)
+        else:
+            prior = newList.pop()
+            newList.append(prior+token)
+    return newList
+
+
 def parse_tokens(tokens, lines=True, tags=False):
     """
     Parses tokens with various options for evaluation methods.
@@ -358,7 +385,7 @@ def findMeter(tokens):
     for line in lines:
         for k,v in meter_dict.items():
             minDist = 999
-            for reading in findLineStress(line)[0]:
+            for reading in findLineStress(line):
                 dist = levenshtein(k,reading)
                 if dist < minDist:
                     minDist = dist
