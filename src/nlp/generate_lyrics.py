@@ -10,11 +10,15 @@ from datetime import datetime
 import json
 import requests
 
-def get_model(model_name):
+def get_model(model_name, GPU=True):
     """
     Retrieve model from google cloud storage
     """
-    model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture.pkl'
+    if GPU:
+        model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture.pkl'
+    else:
+        model_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_architecture_cpu.pkl'
+    
     model = requests.get(model_url)
     model = model.content
     model = pickle.loads(model)
@@ -30,6 +34,16 @@ def get_itos(model_name):
     itos = pickle.loads(itos)
     return itos
 
+def get_preprocessor(model_name):
+    """
+    Retrieve preprocessor from google cloud storage
+    """
+    preprocessor_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_preprocessor.pkl'
+    preprocessor = requests.get(preprocessor_url)
+    preprocessor = preprocessor.content
+    preprocessor = pickle.loads(preprocessor)
+    return preprocessor
+
 class DeepLyric:
     """
     Generate deep lyrics given model and weights
@@ -44,9 +58,11 @@ class DeepLyric:
         'temperature': 1.5,
         'top_k': 3,
         'audio': None,
-        'multinomial': True
+        'multinomial': True,
+        'genre': None,
+        'title': None
     }
-    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None):
+    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None, GPU=True):
         """
         Parameters:
         -----------
@@ -71,16 +87,21 @@ class DeepLyric:
         model_name : str
             Optional model name if Torch model is directly loaded to `model`
             If None the model name will be missing in the metadata output
+            
+        GPU : bool
+            If machine has GPU or not
         """
         # initialize config dictionary to default
         self.set_config(config_dict=copy(self.DEFAULT_CONFIG))
         self.set_config('model_name', model_name)
         self.model_type = model_type
+        if self.model_type == 'multimodal':
+            self.preprocessor = get_preprocessor(model)
         self.set_config('model_type', model_type)
         
         if isinstance(model, str):
             self.set_config('model_name', model)
-            self.model = get_model(model)
+            self.model = get_model(model, GPU=GPU)
             self.itos = get_itos(model)
         else:
             self.model = model
@@ -116,25 +137,34 @@ class DeepLyric:
             self._config[key] = value
         else:
             self._config = config_dict
-            
-    def _set_genre(self):
+    
+    def _create_intial_context(self):
         """
-        Creates config param `seed_text_w_genre`
-        Genre is a special case because we pass it as part of the seed text
+        Creates initial context for `generate_text()` based on
+        `seed_text`, `genre`, and `title` config params
         """
-        pass
         
-    def _set_title(self):
-        """
-        Creates config param `seed_text_w_title`
-        We assume genre is required in order to pass title but not vice versa
-            (In future version we will decouple these two)
-        """
-        pass
+        if self.get_config('genre') and self.get_config('title'):
+            genre = self.get_config('genre')
+            title = self.get_config('title')
+            seed = self.get_config('seed_text')
+            init_context = f'xbos xgenre {genre} xtitle {title}'
+        elif self.get_config('genre'):
+            genre = self.get_config('genre')
+            seed = self.get_config('seed_text')
+            init_context = f'xbos xgenre {genre} xtitle'
+        elif self.get_config('title'):
+            title = self.get_config('title')
+            seed = self.get_config('seed_text')
+            init_context = f'xbos xgenre nan xtitle {title}'
+        else:
+            init_context = self.get_config('seed_text')
+            
+        return init_context
     
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
-        return [self.stoi[w] for w in t]
+        return [self.stoi.get(w, 0) for w in t]
 
     def textify(self, nums, sep=' '):
         "Convert a list of `nums` to their tokens."
@@ -152,9 +182,10 @@ class DeepLyric:
         re_tk = nltk.tokenize.RegexpTokenizer(r'\[[^\]]+\]|\w+|[\d\.,]+|\S+',
                                               discard_empty=False)
         context = re_tk.tokenize_sents(context)[0]
+        context = [word.lower() for word in context]
         return context
     
-    def save_json(self, dir=None, name=None, out=False):
+    def save_json(self, dir=None, name=None, out=False, format_lyrics=False):
         """
         Saves generated lyric and `self.config` to json file in `dir`
         
@@ -186,6 +217,9 @@ class DeepLyric:
         
         song_idx = self.best_song
         song = [self.get_word_from_index(w) for w in song_idx]
+        if format_lyrics:
+            song = self.pretty_format(song)
+        
         payload = {'meta': self.config, 'lyric': song}
         
         if dir:
@@ -195,6 +229,50 @@ class DeepLyric:
                 
         if out:
             return payload
+            
+    def pretty_format(self, context=[]):
+        """
+        Converts lyrics element of list into str with applied formatting
+        
+        Parameters:
+        -----------
+        context : list(`str`)
+            Tokenized strings of generated text
+            
+            
+        Returns:
+        --------
+        words : `str`
+            Pretty formatted string
+        """
+                
+        if not context:
+            context = self.best_song
+        
+        output = []
+        for i in range(len(context)):
+            step = context[i]
+            word = self.textify([step])
+            
+            if word == 'xeol':
+                word = '\n'
+            elif word == 'xbol-1':
+                word = '\n\n'
+            elif 'xbol' in word:
+                continue
+            elif word =='xbos':
+                word = 'SONG START\n'
+            elif word == 'xtitle':
+                word ='\n title:'
+            elif word == 'xgenre':
+                word ='genre:'
+            elif word == 'xeos':
+                word == 'SONG END'
+                break
+                
+            output.append(word)
+            
+        return ' '.join(output)
 
     def print_lyrics(self, context=[]):
         """
@@ -250,7 +328,6 @@ class DeepLyric:
             audio features for a song. `n` should equal the size of the
             multimodal features in `model`
             
-
         Returns:
         ----------
         List of probabilities with length of vocab size
@@ -308,7 +385,6 @@ class DeepLyric:
         ----------
         seed_text : list or str
             List of strings where each item is a token. (e.g. ['the', 'cat']) or string that is split on white space
-
         max_len : int
             Number of words in generated sequence
             
@@ -343,7 +419,8 @@ class DeepLyric:
             [[context, score], [context, score], ..., [context, score]]
         """
         ####### get params from config ############################
-        seed_text = self.get_config('seed_text')
+        # seed_text = self.get_config('seed_text')
+        seed_text = self._create_intial_context()
         max_len = self.get_config('max_len')
         GPU = self.get_config('GPU')
         context_length = self.get_config('context_length')
@@ -419,7 +496,6 @@ class DeepLyric:
         ----------
         seed_text : list or str
             List of strings where each item is a token. (e.g. ['the', 'cat']) or string that is split on white space
-
         max_len : int
             Number of words in generated sequence
             
