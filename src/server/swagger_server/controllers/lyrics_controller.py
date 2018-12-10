@@ -70,4 +70,4 @@ def generate_lyrics(body):  # noqa: E501
     
     #out = deep_lyric.save_json(out=True)
     out = deep_lyric.save_json(format_lyrics=True)
-    return json.dumps(out)
+    return json.dump(out)
