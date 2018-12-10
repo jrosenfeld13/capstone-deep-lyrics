@@ -15,7 +15,7 @@ class LyricsRequest(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, mode: int=None, key: int=None, time_signature: int=None, danceability: float=None, energy: float=None, duration_ms: float=None, loudness: float=None, tempo: float=None, title: str=None, genres: List[str]=None):  # noqa: E501
+    def __init__(self, mode: int=None, key: int=None, time_signature: int=None, danceability: float=None, energy: float=None, duration_ms: float=None, loudness: float=None, tempo: float=None, title: str=None, genres: List[str]=None, beam_width: int=None, top_k: int=None, context_length: int=None, max_len: int=None, context: str=None):  # noqa: E501
         """LyricsRequest - a model defined in Swagger
 
         :param mode: The mode of this LyricsRequest.  # noqa: E501
@@ -38,6 +38,16 @@ class LyricsRequest(Model):
         :type title: str
         :param genres: The genres of this LyricsRequest.  # noqa: E501
         :type genres: List[str]
+        :param beam_width: The beam_width of this LyricsRequest.  # noqa: E501
+        :type beam_width: int
+        :param top_k: The top_k of this LyricsRequest.  # noqa: E501
+        :type top_k: int
+        :param context_length: The context_length of this LyricsRequest.  # noqa: E501
+        :type context_length: int
+        :param max_len: The max_len of this LyricsRequest.  # noqa: E501
+        :type max_len: int
+        :param context: The context of this LyricsRequest.  # noqa: E501
+        :type context: str
         """
         self.swagger_types = {
             'mode': int,
@@ -49,7 +59,12 @@ class LyricsRequest(Model):
             'loudness': float,
             'tempo': float,
             'title': str,
-            'genres': List[str]
+            'genres': List[str],
+            'beam_width': int,
+            'top_k': int,
+            'context_length': int,
+            'max_len': int,
+            'context': str
         }
 
         self.attribute_map = {
@@ -62,7 +77,12 @@ class LyricsRequest(Model):
             'loudness': 'loudness',
             'tempo': 'tempo',
             'title': 'title',
-            'genres': 'genres'
+            'genres': 'genres',
+            'beam_width': 'beam_width',
+            'top_k': 'top_k',
+            'context_length': 'context_length',
+            'max_len': 'max_len',
+            'context': 'context'
         }
 
         self._mode = mode
@@ -75,6 +95,11 @@ class LyricsRequest(Model):
         self._tempo = tempo
         self._title = title
         self._genres = genres
+        self._beam_width = beam_width
+        self._top_k = top_k
+        self._context_length = context_length
+        self._max_len = max_len
+        self._context = context
 
     @classmethod
     def from_dict(cls, dikt) -> 'LyricsRequest':
@@ -306,3 +331,118 @@ class LyricsRequest(Model):
         """
 
         self._genres = genres
+
+    @property
+    def beam_width(self) -> int:
+        """Gets the beam_width of this LyricsRequest.
+
+        Advanced parameter for the beam width of the beam search algorithm used for lyrics generation.  # noqa: E501
+
+        :return: The beam_width of this LyricsRequest.
+        :rtype: int
+        """
+        return self._beam_width
+
+    @beam_width.setter
+    def beam_width(self, beam_width: int):
+        """Sets the beam_width of this LyricsRequest.
+
+        Advanced parameter for the beam width of the beam search algorithm used for lyrics generation.  # noqa: E501
+
+        :param beam_width: The beam_width of this LyricsRequest.
+        :type beam_width: int
+        """
+
+        self._beam_width = beam_width
+
+    @property
+    def top_k(self) -> int:
+        """Gets the top_k of this LyricsRequest.
+
+        Advanced parameter for the search algorithm used for lyrics generation, indicating how many of the top sequences we keep in memory for each word added.  # noqa: E501
+
+        :return: The top_k of this LyricsRequest.
+        :rtype: int
+        """
+        return self._top_k
+
+    @top_k.setter
+    def top_k(self, top_k: int):
+        """Sets the top_k of this LyricsRequest.
+
+        Advanced parameter for the search algorithm used for lyrics generation, indicating how many of the top sequences we keep in memory for each word added.  # noqa: E501
+
+        :param top_k: The top_k of this LyricsRequest.
+        :type top_k: int
+        """
+
+        self._top_k = top_k
+
+    @property
+    def context_length(self) -> int:
+        """Gets the context_length of this LyricsRequest.
+
+        Length of the context we keep for lyrics generation  # noqa: E501
+
+        :return: The context_length of this LyricsRequest.
+        :rtype: int
+        """
+        return self._context_length
+
+    @context_length.setter
+    def context_length(self, context_length: int):
+        """Sets the context_length of this LyricsRequest.
+
+        Length of the context we keep for lyrics generation  # noqa: E501
+
+        :param context_length: The context_length of this LyricsRequest.
+        :type context_length: int
+        """
+
+        self._context_length = context_length
+
+    @property
+    def max_len(self) -> int:
+        """Gets the max_len of this LyricsRequest.
+
+        Max length in words for the lyric to be generated.  # noqa: E501
+
+        :return: The max_len of this LyricsRequest.
+        :rtype: int
+        """
+        return self._max_len
+
+    @max_len.setter
+    def max_len(self, max_len: int):
+        """Sets the max_len of this LyricsRequest.
+
+        Max length in words for the lyric to be generated.  # noqa: E501
+
+        :param max_len: The max_len of this LyricsRequest.
+        :type max_len: int
+        """
+
+        self._max_len = max_len
+
+    @property
+    def context(self) -> str:
+        """Gets the context of this LyricsRequest.
+
+        Advanced parameter for language model context.  # noqa: E501
+
+        :return: The context of this LyricsRequest.
+        :rtype: str
+        """
+        return self._context
+
+    @context.setter
+    def context(self, context: str):
+        """Sets the context of this LyricsRequest.
+
+        Advanced parameter for language model context.  # noqa: E501
+
+        :param context: The context of this LyricsRequest.
+        :type context: str
+        """
+
+        self._context = context

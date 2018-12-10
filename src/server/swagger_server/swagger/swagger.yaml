@@ -73,6 +73,24 @@ definitions:
         description: "comma-separated list of genres"
         items:
           type: "string"
+      beam_width:
+        type: "integer"
+        description: "Advanced parameter for the beam width of the beam search algorithm\
+          \ used for lyrics generation."
+      top_k:
+        type: "integer"
+        description: "Advanced parameter for the search algorithm used for lyrics\
+          \ generation, indicating how many of the top sequences we keep in memory\
+          \ for each word added."
+      context_length:
+        type: "integer"
+        description: "Length of the context we keep for lyrics generation"
+      max_len:
+        type: "integer"
+        description: "Max length in words for the lyric to be generated."
+      context:
+        type: "string"
+        description: "Advanced parameter for language model context."
     example:
       mode: 0
       duration_ms: 0.59621339166831821554382031536079011857509613037109375

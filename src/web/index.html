@@ -68,6 +68,7 @@ body {font-size:16px;}
 
 
     <h2 class="w3-xlarge w3-text-red"><b>Spotify Song Lyric Generation</b></h2>
+    Search for songs in Spotify, and we'll generate a lyric for it using the audio information. If you are an advanced user and want to further customize your lyrics technical parameters, we'll show you the advanced lyric parameters and you can edit them to make your perfect lyric!
     <!-- <form action="javascript:()"> -->
       <div class="w3-section">
         <label>Song or artist search terms</label>
@@ -87,6 +88,7 @@ body {font-size:16px;}
     </div>  
     
     <h2 class="w3-xlarge w3-text-red"><b>Customized Lyric Generation</b></h2>
+    If you don't have any song in particular you want a lyric for, we can just create a lyric based on general parameters such as danceability, mode or genre. We'll provide you with some options to get you started and you can modify and customize them!
     <button type="button" onclick="javascript:customized()" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Customize</button>
   </div>
   
@@ -118,7 +120,7 @@ body {font-size:16px;}
        
          <div id="lyrics_details" class="w3-container city">
           <h1>Details</h1>
-          <p id="lyrics_details_p">Technical details from the lyrics response like scores.</p>
+          <pre id="lyrics_details_p">Technical details from the lyrics response like scores.</pre>
          </div>
 
          <div id="lyrics_parameters" class="w3-container city">
@@ -133,6 +135,12 @@ body {font-size:16px;}
         </div>
        </div>
 
+       <div id="id03" class="w3-modal">
+        <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+          <div id="loader"></div>
+        </div>
+       </div>
+       
       <!-- Lyric configuration modal -->
       <div id="id02" class="w3-modal">
         <div class="w3-modal-content w3-card-4 w3-animate-zoom">
@@ -140,9 +148,12 @@ body {font-size:16px;}
           <span onclick="document.getElementById('id02').style.display='none'" 
           class="w3-button w3-red w3-xlarge w3-display-topright">&times;</span>
           <h2>Deep Lyrics Settings</h2>
+          Click on the 'Generate' button to get your lyrics. 
+          If you want to customize how we generate those lyrics, edit the parameters below. 
+          Generating a new lyrics for summertime, but want it with an oldies twist? Add an 'oldies' genre!
          </header>
-         <button class="tablink w3-bar-item w3-button" onclick="openSection(event, 'generated_lyrics2')">Lyrics settings</button>
-         <div id="generated_lyrics2" class="w3-container city">
+         <button class="tablink2 w3-bar-item w3-button" onclick="openSection(event, 'generated_lyrics2')">Lyrics settings</button>
+         <div id="generated_lyrics2" class="w3-container city2">
           <h1>Lyrics Configuration</h1>
           <div id="lyrics_div2" class="m4 w3-margin-bottom"  >
             <div class="w3-light-grey">
@@ -186,7 +197,7 @@ body {font-size:16px;}
 
   <!-- The Team -->
   <div class="w3-row-padding w3-grayscale">
-    <div class="w3-col m4 w3-margin-bottom">
+    <div class="w3-col m3 w3-margin-bottom">
       <div class="w3-light-grey">
         <!-- <img src="/w3images/team2.jpg" alt="John" style="width:100%"> -->
         <div class="w3-container">
@@ -195,7 +206,7 @@ body {font-size:16px;}
         </div>
       </div>
     </div>
-    <div class="w3-col m4 w3-margin-bottom">
+    <div class="w3-col m3 w3-margin-bottom">
       <div class="w3-light-grey">
         <!-- <img src="/w3images/team1.jpg" alt="Jane" style="width:100%"> -->
         <div class="w3-container">
@@ -204,7 +215,7 @@ body {font-size:16px;}
         </div>
       </div>
     </div>
-    <div class="w3-col m4 w3-margin-bottom">
+    <div class="w3-col m3 w3-margin-bottom">
       <div class="w3-light-grey">
         <!-- <img src="/w3images/team3.jpg" alt="Mike" style="width:100%"> -->
         <div class="w3-container">
@@ -213,12 +224,12 @@ body {font-size:16px;}
         </div>
       </div>
     </div>
-    <div class="w3-col m4 w3-margin-bottom">
+    <div class="w3-col m3 w3-margin-bottom">
       <div class="w3-light-grey">
-        <!-- <img src="/w3images/team3.jpg" alt="Mike" style="width:100%"> -->
+        <img src="images/carlos.jpg" alt="Carlos Castro" style="width:100%">
         <div class="w3-container">
-          <h3>Carlos</h3>
-          <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+          <h3>Carlos Castro</h3>
+          <p> Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
         </div>
       </div>
     </div>
@@ -248,6 +259,8 @@ function openSection(evt, sectionName) {
   evt.currentTarget.classList.add("w3-light-grey");
 }
 
+document.getElementsByClassName("tablink2")[0].click();
+
 function customized() {
   
   const example = JSON.stringify({
@@ -260,11 +273,10 @@ function customized() {
                   title: "All Yours",
                   genres: ['oldies', 'rock'],
                   time_signature: 4,
-                  // context: 'xbos',
-                  // beam_width: 1,
-                  // top_k: 2,
-                  // context_length: 2,
-                  // max_len: 100
+                  beam_width: 3,
+                  top_k: 15,
+                  context_length: 70,
+                  max_len: 120
               });
 
   document.getElementById('modal_generate').onclick = function() {generateLyricsForSong(null, null, null, false, true);};    
@@ -339,7 +351,7 @@ function generateRandomLyrics() {
 
 function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
   const accessToken = getAccessTokenFromUrl();
-  if(!accessToken) {
+  if(!accessToken && !isCustom) {
         window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://localhost:8888/&response_type=token&state=123');
     } else {
 
@@ -377,16 +389,19 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                     title: title,
                     genres: artistJson.genres,
                     time_signature: features.time_signature,
-                    // context: 'xbos',
-                    // beam_width: 1,
-                    // top_k: 2,
-                    // context_length: 2,
-                    // max_len: 100
+                    beam_width: 3,
+                    top_k: 15,
+                    context_length: 70,
+                    max_len: 120
                 });
 
               if (callServer) {
 
                 lyricsRequestBody = document.getElementById('lyrics_p2').innerText;
+                document.getElementById('id02').style.display='none';
+                document.getElementById('id03').style.display='block';
+                document.getElementById("loader").style.display = "block";
+                
 
                 // Call local server for lyric generation
                 const url = 'http://localhost:8000'
@@ -399,11 +414,16 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                 }).then(function(response) {
                     return response.text();
                 }).then(function(text) {
-                    //document.getElementById("song_search_results").innerHTML = "";
-                    showLyrics(text);
-                    //document.getElementById("song_search_results").style.display = "none";
-                    //window.location.href = "#try";
-                    document.getElementById('id02').style.display='none';
+
+                    const responseJson = JSON.parse(text);
+
+                    showLyrics(responseJson.lyric);
+
+                    document.getElementById('lyrics_details_p').innerHTML = JSON.stringify(responseJson.metrics, undefined, 2);
+
+                    document.getElementById('id03').style.display='none';
+                    document.getElementById("loader").style.display = "none";
+                    
                     document.getElementById('id01').style.display='block';
                     document.getElementById('lyrics_parameters_p').innerHTML = JSON.stringify(JSON.parse(lyricsRequestBody), undefined, 2);
                     
@@ -421,7 +441,9 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
       } else {
         // custom lyrics
         let lyricsRequestBody = document.getElementById('lyrics_p2').innerText;
-
+        document.getElementById('id02').style.display='none';
+        document.getElementById('id03').style.display='block';
+        document.getElementById("loader").style.display = "block";
         // Call local server for lyric generation
         const url = 'http://localhost:8000'
         fetch(`${url}/lyrics`, {
@@ -433,14 +455,15 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
         }).then(function(response) {
             return response.text();
         }).then(function(text) {
-            //document.getElementById("song_search_results").innerHTML = "";
-            showLyrics(text);
-            //document.getElementById("song_search_results").style.display = "none";
-            //window.location.href = "#try";
-            document.getElementById('id02').style.display='none';
-            document.getElementById('id01').style.display='block';
-            document.getElementById('lyrics_parameters_p').innerHTML = JSON.stringify(JSON.parse(lyricsRequestBody), undefined, 2);
-            
+          showLyrics(responseJson.lyric);
+
+          document.getElementById('lyrics_details_p').innerHTML = JSON.stringify(responseJson.metrics, undefined, 2);
+
+          document.getElementById('id03').style.display='none';
+          document.getElementById("loader").style.display = "none";
+
+          document.getElementById('id01').style.display='block';
+          document.getElementById('lyrics_parameters_p').innerHTML = JSON.stringify(JSON.parse(lyricsRequestBody), undefined, 2);
         }).catch(function(ex) {
           log(ex);
           alert(`response failed ${ex}`);
