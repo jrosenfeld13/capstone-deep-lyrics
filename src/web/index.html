@@ -358,7 +358,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
         if (!isCustom) {
 
           // Get audio features for song
-          fetch(`https://api.spotify.com/v1/audio-features?ids=${trackId}`, { 
+          fetch(`https://api.spotify.com/v1/audio-features?ids=${trackId}`, {
               method: 'GET',
               headers: new Headers({
                 'Authorization': 'Bearer ' + accessToken
@@ -404,7 +404,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                 
 
                 // Call local server for lyric generation
-                const url = 'http://localhost:8000'
+                const url = 'http://34.228.251.186:8000'
                 fetch(`${url}/lyrics`, {
                     method: 'POST',
                     headers: {
@@ -445,7 +445,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
         document.getElementById('id03').style.display='block';
         document.getElementById("loader").style.display = "block";
         // Call local server for lyric generation
-        const url = 'http://localhost:8000'
+        const url = 'http://34.228.251.186:8000'
         fetch(`${url}/lyrics`, {
             method: 'POST',
             headers: {
