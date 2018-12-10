@@ -2,8 +2,9 @@ import numpy as np
 import nltk
 from nltk.translate import bleu_score
 import nltk.tokenize
-from fastai import *
-from fastai.text import *
+
+#from fastai import *
+#from fastai.text import *
 
 from collections import Counter
 from collections import defaultdict
@@ -36,7 +37,9 @@ def combine_contraction(token_list, sign="'"):
     """
     newList= []
     for token in token_list:
-        if not token.startswith(sign):
+        if not newList:
+            newList.append(token)
+        elif not token.startswith(sign):
             newList.append(token)
         else:
             prior = newList.pop()
@@ -66,7 +69,10 @@ def parse_tokens(tokens, lines=True, tags=False, contraction=False):
     # lines and no tags
     if contraction:
         tokens = combine_contraction(tokens)
-    
+
+    if tokens and not tokens[-1] == 'xeos':
+        tokens.append('xeos')
+        
     if lines and not tags:
         reached_bol = False
         parsed_tokens = []
@@ -259,7 +265,7 @@ def bleu(tokens, ref_list, nGram=4, nGramType='cumulative', shouldSmooth=True):
     if shouldSmooth==True:
         smoother = bleu_score.SmoothingFunction().method5
     else:
-        smoother = None
+        smoother = bleu_score.SmoothingFunction().method1
     score = bleu_score.sentence_bleu(references, candidate, weights, smoothing_function=smoother)
     return score
 
@@ -379,26 +385,32 @@ def findMeter(tokens):
 
     # initialize
     vote_cnt = Counter()
-    
-    lines = parse_tokens(tokens, lines=True, tags=False, contraction=True)
-    line_cnt = len(lines)
-    minDist = 999
+    try:
+        lines = parse_tokens(tokens, lines=True, tags=False, contraction=True)
+        line_cnt = len(lines)
+        minDist = 999
 
-    # update distances
-    for line in lines:
-        for k,v in meter_dict.items():
-            minDist = 999
-            for reading in findLineStress(line):
-                dist = levenshtein(k,reading)
-                if dist < minDist:
-                    minDist = dist
-            vote_cnt[v] += minDist
+        # update distances
+        for line in lines:
+            for k,v in meter_dict.items():
+                minDist = 999
+                for reading in findLineStress(line):
+                    dist = levenshtein(k,reading)
+                    if dist < minDist:
+                        minDist = dist
+                vote_cnt[v] += minDist
 
-    lowest = min(vote_cnt.values())
-    options = [k for k,v in vote_cnt.items() if v==lowest]
+        lowest = min(vote_cnt.values())
+        options = [k for k,v in vote_cnt.items() if v==lowest]
+        editsPerLine = lowest/float(line_cnt)
     
-    # use set_metric
-    return options, lowest/float(line_cnt)
+    except:
+        options = None
+        editsPerLine = None
+    
+    finally:
+        # use set_metric
+        return options, editsPerLine
 
 def get_POS_conformity(tokens):
     """
