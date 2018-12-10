@@ -233,15 +233,15 @@ class DeepLyric:
         if out:
             return payload
             
-    def pretty_format(self, context=[]):
+    def pretty_format(self, tokens):
         """
         Converts lyrics element of list into str with applied formatting
         
         Parameters:
         -----------
-        context : list(`str`)
+        Tokens : list(`str`)
             Tokenized strings of generated text
-            
+            *Note* input signature not the same as `print_lyrics`
             
         Returns:
         --------
@@ -249,13 +249,8 @@ class DeepLyric:
             Pretty formatted string
         """
                 
-        if not context:
-            context = self.best_song
-        
         output = []
-        for i in range(len(context)):
-            step = context[i]
-            word = self.textify([step])
+        for word in tokens:
             
             if word == 'xeol':
                 word = '\n'
