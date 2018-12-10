@@ -258,7 +258,7 @@ testpath=0.3.1=py36h8cadb63_0
 thinc=6.12.0=py36h4989274_0
 tk=8.6.7=hc745277_3
 toolz=0.9.0=py36_0
-torchvision-nightly
+torchvision
 tornado=5.0.2=py36_0
 tqdm=4.28.1=py36h28b3542_0
 traitlets=4.3.2=py36h674d592_0
