@@ -305,7 +305,7 @@ function searchSongs() {
     const accessToken = getAccessTokenFromUrl();
 
     if(!accessToken) {
-        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://localhost:8887/&response_type=token&state=123');
+        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://34.228.251.186:8887/&response_type=token&state=123');
     } else {
         fetch(`https://api.spotify.com/v1/search?q=${term}&type=track&limit=20`, {
             method: 'GET',
@@ -352,7 +352,7 @@ function generateRandomLyrics() {
 function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
   const accessToken = getAccessTokenFromUrl();
   if(!accessToken && !isCustom) {
-        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://localhost:8887/&response_type=token&state=123');
+        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://34.228.251.186:8887/&response_type=token&state=123');
     } else {
 
         if (!isCustom) {
