@@ -73,5 +73,5 @@ def generate_lyrics(body):  # noqa: E501
     deep_lyric.generate_text()
     
     #out = deep_lyric.save_json(out=True)
-    out = deep_lyric.save_json(format_lyrics=True)
+    out = deep_lyric.save_json(out=True, format_lyrics=True)
     return json.dump(out)
