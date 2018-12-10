@@ -25,7 +25,9 @@ def generate_lyrics(body):  # noqa: E501
         body = connexion.request.get_json()  # noqa: E501
 
     # Settings to load DeepLyric Instance
+    FILE_DIR = Path(os.path.dirname(__file__))
     MODEL_ROOT = Path('../../../../models')
+    MODEL_ROOT = FILE_DIR/MODEL_ROOT
     
     assert body['model_type'] in ['language', 'multimodal'], "Model does not exist."
     if body['model_type'] == 'multimodal':
