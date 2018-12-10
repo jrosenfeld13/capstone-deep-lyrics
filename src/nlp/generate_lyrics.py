@@ -171,19 +171,25 @@ class DeepLyric:
         if self.get_config('seed_text'):
             seed = self.tokenize(self.get_config('seed_text'))
             
-
+        init_context = []
         if self.get_config('genre') and self.get_config('title'):
-            init_context = ['xbos', 'xgenre']+genre+['xtitle']+title+['xbol-1']
+            init_context += ['xbos', 'xgenre']
+            init_context += genre
+            init_context += ['xtitle']
+            init_context += title
+            init_context += ['xbol-1']
         elif self.get_config('genre'):
-            genre = self.get_config('genre')
-            init_context = ['xbos', 'xgenre']+[genre]+['xtitle']
+            init_context += ['xbos', 'xgenre']
+            init_context += genre
+            init_context += ['xtitle']
         elif self.get_config('title'):
-            title = self.get_config('title')
-            init_context = ['xbos', 'xgenre', 'nan', 'xtitle']+title+['xbol-1']
+            init_context += ['xbos', 'xgenre', 'nan', 'xtitle']
+            init_context += title
+            init_context += ['xbol-1']
         else:
-            init_context = ['xbos']
+            init_context += ['xbos']
             
-        if seed:
+        if self.get_config('seed_text'):
             # append custom seed text
             init_context += seed
             
