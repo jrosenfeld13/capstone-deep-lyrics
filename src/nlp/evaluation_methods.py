@@ -63,7 +63,7 @@ def parse_tokens(tokens, lines=True, tags=False, contractions=False):
           
     """
     if contractions:
-        tokens = combine_contraction(tokens)
+        tokens = combine_contractions(tokens)
     
     # lines and no tags
     if lines and not tags:
