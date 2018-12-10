@@ -85,7 +85,7 @@ body {font-size:16px;}
     <!-- Song display -->
 
     <div id="song_search_results" class="w3-row-padding w3-grayscale">
-    </div>  
+    </div>
     
     <h2 class="w3-xlarge w3-text-red"><b>Customized Lyric Generation</b></h2>
     If you don't have any song in particular you want a lyric for, we can just create a lyric based on general parameters such as danceability, mode or genre. We'll provide you with some options to get you started and you can modify and customize them!
@@ -95,8 +95,8 @@ body {font-size:16px;}
       <!-- Lyric result tabbed modal -->
       <div id="id01" class="w3-modal">
         <div class="w3-modal-content w3-card-4 w3-animate-zoom">
-         <header class="w3-container w3-red"> 
-          <span onclick="document.getElementById('id01').style.display='none'" 
+         <header class="w3-container w3-red">
+          <span onclick="document.getElementById('id01').style.display='none'"
           class="w3-button w3-red w3-xlarge w3-display-topright">&times;</span>
           <h2>Deep Lyrics</h2>
          </header>
@@ -129,7 +129,7 @@ body {font-size:16px;}
          </div>
        
          <div class="w3-container w3-light-grey w3-padding">
-          <button class="w3-button w3-right w3-white w3-border" 
+          <button class="w3-button w3-right w3-white w3-border"
           onclick="document.getElementById('id01').style.display='none'">Close</button>
          </div>
         </div>
@@ -144,12 +144,12 @@ body {font-size:16px;}
       <!-- Lyric configuration modal -->
       <div id="id02" class="w3-modal">
         <div class="w3-modal-content w3-card-4 w3-animate-zoom">
-         <header class="w3-container w3-red"> 
-          <span onclick="document.getElementById('id02').style.display='none'" 
+         <header class="w3-container w3-red">
+          <span onclick="document.getElementById('id02').style.display='none'"
           class="w3-button w3-red w3-xlarge w3-display-topright">&times;</span>
           <h2>Deep Lyrics Settings</h2>
-          Click on the 'Generate' button to get your lyrics. 
-          If you want to customize how we generate those lyrics, edit the parameters below. 
+          Click on the 'Generate' button to get your lyrics.
+          If you want to customize how we generate those lyrics, edit the parameters below.
           Generating a new lyrics for summertime, but want it with an oldies twist? Add an 'oldies' genre!
          </header>
          <button class="tablink2 w3-bar-item w3-button" onclick="openSection(event, 'generated_lyrics2')">Lyrics settings</button>
@@ -167,7 +167,7 @@ body {font-size:16px;}
          <button type="button" id="modal_generate" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Generate</button>
 
          <div class="w3-container w3-light-grey w3-padding">
-          <button class="w3-button w3-right w3-white w3-border" 
+          <button class="w3-button w3-right w3-white w3-border"
           onclick="document.getElementById('id02').style.display='none'">Close</button>
          </div>
         </div>
@@ -279,14 +279,14 @@ function customized() {
                   max_len: 120
               });
 
-  document.getElementById('modal_generate').onclick = function() {generateLyricsForSong(null, null, null, false, true);};    
+  document.getElementById('modal_generate').onclick = function() {generateLyricsForSong(null, null, null, false, true);};
   document.getElementById('lyrics_p2').innerText = example;
   document.getElementById('id02').style.display='block';
   
 }
 
 /*
-* Spotify API 
+* Spotify API
 */
 
 function getAccessTokenFromUrl() {
@@ -305,10 +305,10 @@ function searchSongs() {
     const accessToken = getAccessTokenFromUrl();
 
     if(!accessToken) {
-        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://localhost:8888/&response_type=token&state=123');
+        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://deeplyrics.net/&response_type=token&state=123');
     } else {
-        fetch(`https://api.spotify.com/v1/search?q=${term}&type=track&limit=20`, { 
-            method: 'GET', 
+        fetch(`https://api.spotify.com/v1/search?q=${term}&type=track&limit=20`, {
+            method: 'GET',
             headers: new Headers({
               'Authorization': 'Bearer ' + accessToken
             })
@@ -352,14 +352,14 @@ function generateRandomLyrics() {
 function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
   const accessToken = getAccessTokenFromUrl();
   if(!accessToken && !isCustom) {
-        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://localhost:8888/&response_type=token&state=123');
+        window.location.replace('https://accounts.spotify.com/authorize?client_id=d74ff6993a754cf8a6d439ec00ce6e66&redirect_uri=http://deeplyrics.net/&response_type=token&state=123');
     } else {
 
         if (!isCustom) {
 
           // Get audio features for song
-          fetch(`https://api.spotify.com/v1/audio-features?ids=${trackId}`, { 
-              method: 'GET', 
+          fetch(`https://api.spotify.com/v1/audio-features?ids=${trackId}`, {
+              method: 'GET',
               headers: new Headers({
                 'Authorization': 'Bearer ' + accessToken
               })
@@ -368,8 +368,8 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
           }).then(json => {
 
             // Get artist information for genres
-            fetch(`https://api.spotify.com/v1/artists/${artistId}`, { 
-              method: 'GET', 
+            fetch(`https://api.spotify.com/v1/artists/${artistId}`, {
+              method: 'GET',
               headers: new Headers({
                 'Authorization': 'Bearer ' + accessToken
               })
@@ -404,7 +404,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                 
 
                 // Call local server for lyric generation
-                const url = 'http://localhost:8000'
+                const url = 'http://34.228.251.186:8000'
                 fetch(`${url}/lyrics`, {
                     method: 'POST',
                     headers: {
@@ -445,7 +445,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
         document.getElementById('id03').style.display='block';
         document.getElementById("loader").style.display = "block";
         // Call local server for lyric generation
-        const url = 'http://localhost:8000'
+        const url = 'http://34.228.251.186:8000'
         fetch(`${url}/lyrics`, {
             method: 'POST',
             headers: {
