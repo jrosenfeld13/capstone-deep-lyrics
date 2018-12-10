@@ -206,7 +206,7 @@ class DeepLyric:
         audio_df = pd.DataFrame([audio_df],
                                 columns=['loudness', 'duration', 'key', 'mode', 'time_signature', 'tempo'])
         # hack -- receives numpy array, converts to dataframe internally
-        if audio_df is not None:
+        if (audio_df is not None) and (self.preprocessor is not None):
             audio_features = self.preprocessor.transform(audio_df)
         else:
             audio_features = None
