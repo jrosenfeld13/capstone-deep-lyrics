@@ -49,7 +49,7 @@ def generate_lyrics(body):  # noqa: E501
     with open(itos_file, 'rb') as f:
         itos = pickle.load(f)
         
-    deep_lyric = DeepLyric(architecture=architecture,
+    deep_lyric = DeepLyric(model=architecture,
                            itos=itos,
                            model_type=body['model_type'],
                            preprocessor=None,
