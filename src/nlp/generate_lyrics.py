@@ -162,26 +162,28 @@ class DeepLyric:
         predicted probabilities that differ from the domain.
         """
         
+        if self.get_config('genre'):
+            genre = self.tokenize(self.get_config('genre'))
+            
+        if self.get_config('title'):
+            title = self.tokenize(self.get_config('title'))
+            
+        if self.get_config('seed_text'):
+            seed = self.tokenize(self.get_config('seed_text'))
+            
+
         if self.get_config('genre') and self.get_config('title'):
-            genre = self.get_config('genre')
-            title = self.get_config('title')
-            init_context = ['xbos', 'xgenre', genre, 'xtitle', title, 'xbol-1']
+            init_context = ['xbos', 'xgenre']+genre+['xtitle']+title+['xbol-1']
         elif self.get_config('genre'):
             genre = self.get_config('genre')
-            init_context = ['xbos', 'xgenre', genre, 'xtitle']
+            init_context = ['xbos', 'xgenre']+[genre]+['xtitle']
         elif self.get_config('title'):
             title = self.get_config('title')
-            seed = self.get_config('seed_text')
-            init_context = ['xbos', 'xgenre', 'nan', 'xtitle', title, 'xbol-1']
+            init_context = ['xbos', 'xgenre', 'nan', 'xtitle']+title+['xbol-1']
         else:
             init_context = ['xbos']
             
-        if self.get_config('seed_text'):
-            seed = self.get_config('seed_text')
-            
-            if isinstance(seed, str):
-                seed = self.tokenize(seed)
-
+        if seed:
             # append custom seed text
             init_context += seed
             
