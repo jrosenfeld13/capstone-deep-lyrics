@@ -25,19 +25,21 @@ def generate_lyrics(body):  # noqa: E501
         body = connexion.request.get_json()  # noqa: E501
 
     # Settings to load DeepLyric Instance
+    MODEL_ROOT = Path('../../../../models')
+    
     assert body['model_type'] in ['language', 'multimodal'], "Model does not exist."
     if body['model_type'] == 'multimodal':
         MODEL_NAME = '4.3-MM-108k-post-genre-song_title'
         
         # file load (preprocessor for audio)
-        preproc_file = Path('../../../../models/'/f'{MODEL_NAME}_preprocessor.pkl')
+        preproc_file = MODEL_ROOT/f'{MODEL_NAME}_preprocessor.pkl'
         with open(preproc_file, 'rb') as f:
             preproc = pickle.load(f)
     else:
         MODEL_NAME = '4.2-LM-108k-lines-genre-song_title'
         
-    model_file = Path('../../../../models/'/f'{MODEL_NAME}_architecture.pkl')
-    itos_file = Path('../../../../models/'/f'{MODEL_NAME}_itos.pkl')
+    model_file = MODEL_ROOT/f'{MODEL_NAME}_architecture.pkl'
+    itos_file = MODEL_ROOT/f'{MODEL_NAME}_itos.pkl'
     # preproc_file = Path('../../../../models/'/f'{model_name}_preprocessor.pkl')
 
     with open(model_file, 'rb') as f:
