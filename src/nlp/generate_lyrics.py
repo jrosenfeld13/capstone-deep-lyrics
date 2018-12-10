@@ -63,7 +63,8 @@ class DeepLyric:
         'genre': None,
         'title': None
     }
-    def __init__(self, model, itos=None, weights=None, model_type='language', model_name=None, preprocessor=None, GPU=True):
+    def __init__(self, model, itos=None, weights=None, model_type='language',
+                 model_name=None, preprocessor=None, GPU=True):
         """
         Parameters:
         -----------
