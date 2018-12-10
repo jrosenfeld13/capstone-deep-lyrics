@@ -193,7 +193,7 @@ class Evaluator(DeepLyric):
         if out:
             return self.metrics
 
-    def save_json(self, dir=None, name=None, out=False):
+    def save_json(self, dir=None, name=None, out=False, format_lyrics=False):
         """
         Saves `self.deep_lyric.cofig`, `self.metrics`, and `self.generated_song`
         to JSON
@@ -224,9 +224,14 @@ class Evaluator(DeepLyric):
         except AttributeError as e:
             print(f"{e} : first generate song using `set_lyric_state=True`")
             raise
+            
+        if format_lyrics:
+            lyric = self.deep_lyric.pretty_format(self.generated_song)
+        else:
+            lyric = self.generated_song
         
         payload = {'meta': self.deep_lyric.config,
-                   'lyric': self.generated_song,
+                   'lyric': lyric,
                    'metrics': self.metrics}
         
         if dir:

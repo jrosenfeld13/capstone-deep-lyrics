@@ -19,7 +19,7 @@ bash "$ANACONDA_INSTALLER" -b
 echo export PATH=~/anaconda3/bin:$PATH >> ${HOME}/.bashrc
 source ${HOME}/.bashrc
 
-# set up conda channels
+# set up conda channels for requirements.txt later
 conda config --add channels pytorch
 conda config --add channels fastai
 conda config --append channels conda-forge
