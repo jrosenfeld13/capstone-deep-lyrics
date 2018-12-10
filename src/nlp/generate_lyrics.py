@@ -199,8 +199,13 @@ class DeepLyric:
         """
         Converts the dataframe of audio features into feature vector
         using `self.preprocessor`.
+        DEMO UPDATE: receives list (pandas is not serializable) and converts
+        internally to pandas
         """
         audio_df = self.get_config('audio')
+        audio_df = pd.DataFrame([audio_df],
+                                columns=['loudness', 'duration', 'key', 'mode', 'time_signature', 'tempo'])
+        # hack -- receives numpy array, converts to dataframe internally
         if audio_df is not None:
             audio_features = self.preprocessor.transform(audio_df)
         else:
