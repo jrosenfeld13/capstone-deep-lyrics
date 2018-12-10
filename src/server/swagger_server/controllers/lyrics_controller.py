@@ -70,8 +70,12 @@ def generate_lyrics(body):  # noqa: E501
     # deep_lyric.set_config('top_k', 5)
     # deep_lyric.set_config('temperature', 1.45)
     
-    deep_lyric.generate_text()
+    # deep_lyric.generate_text()
+    evaluator = Evaluator(deep_lyric)
+    evaluator.get_lyric()
+    evaluator.evaluate()
+    out = evaluator.save_json(out=True, format_lyrics=True)
     
     #out = deep_lyric.save_json(out=True)
-    out = deep_lyric.save_json(out=True, format_lyrics=True)
+    # out = deep_lyric.save_json(out=True, format_lyrics=True)
     return json.dumps(out)
