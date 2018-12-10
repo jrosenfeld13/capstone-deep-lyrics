@@ -50,7 +50,7 @@ class DeepLyric:
     Generate deep lyrics given model and weights
     """
     DEFAULT_CONFIG = {
-        'seed_text': 'xbos',
+        'seed_text': None,
         'max_len': 40,
         'GPU': True,
         'context_length': 30,
@@ -96,22 +96,28 @@ class DeepLyric:
         # initialize config dictionary to default
         self.set_config(config_dict=copy(self.DEFAULT_CONFIG))
         self.set_config('model_name', model_name)
-        self.model_type = model_type
-        if self.model_type == 'multimodal':
-            self.preprocessor = preprocessor
-        self.set_config('model_type', model_type)
         
+        # load model and itos and preproc
         if isinstance(model, str):
             self.set_config('model_name', model)
             self.model = get_model(model, GPU=GPU)
             self.itos = get_itos(model)
+            self.preprocessor = get_preprocessor(model)
         else:
             self.model = model
             self.itos = itos
+            self.preprocessor = preprocessor
         
+        # stoi init
         self.stoi = {v:k for k,v in enumerate(self.itos)}
         
-    
+        # model type init
+        self.model_type = model_type
+        self.set_config('model_type', model_type)
+        
+        if self.model_type == 'multimodal':
+            self._get_multimodal_size()
+            
     @property
     def config(self):
         return self._config
@@ -133,37 +139,91 @@ class DeepLyric:
         value : str
             configuration value
         config_dict : dict
-            dictionary of {`key`: `value`} for passing in multiple parameters
+            dictionary of {`key`: `value`} for passing in ALL parameters
         """
         if not config_dict:
             self._config[key] = value
         else:
             self._config = config_dict
     
-    def _create_intial_context(self):
+    def _create_initial_context(self):
         """
         Creates initial context for `generate_text()` based on
         `seed_text`, `genre`, and `title` config params
+        
+        Note: There are some limitations with the way we have tokenized genres
+        and put them directly into the language models
+        
+        We notice that in the case of only genre, the seed is appended immediately
+        following the `xtitle` tag. Also, when no genre or title is set,
+        we append the seed immediately following `xbos`.
+        
+        These slight variations to the tag patterns could cause variations in the
+        predicted probabilities that differ from the domain.
         """
         
+        if self.get_config('genre'):
+            genre = self.tokenize(self.get_config('genre'))
+            
+        if self.get_config('title'):
+            title = self.tokenize(self.get_config('title'))
+            
+        if self.get_config('seed_text'):
+            seed = self.tokenize(self.get_config('seed_text'))
+            
+        init_context = []
         if self.get_config('genre') and self.get_config('title'):
-            genre = self.get_config('genre')
-            title = self.get_config('title')
-            seed = self.get_config('seed_text')
-            init_context = f'xbos xgenre {genre} xtitle {title}'
+            init_context += ['xbos', 'xgenre']
+            init_context += genre
+            init_context += ['xtitle']
+            init_context += title
+            init_context += ['xbol-1']
         elif self.get_config('genre'):
-            genre = self.get_config('genre')
-            seed = self.get_config('seed_text')
-            init_context = f'xbos xgenre {genre} xtitle'
+            init_context += ['xbos', 'xgenre']
+            init_context += genre
+            init_context += ['xtitle']
         elif self.get_config('title'):
-            title = self.get_config('title')
-            seed = self.get_config('seed_text')
-            init_context = f'xbos xgenre nan xtitle {title}'
+            init_context += ['xbos', 'xgenre', 'nan', 'xtitle']
+            init_context += title
+            init_context += ['xbol-1']
         else:
-            init_context = self.get_config('seed_text')
+            init_context += ['xbos']
+            
+        if self.get_config('seed_text'):
+            # append custom seed text
+            init_context += seed
             
         return init_context
-    
+
+    def _vectorize_audio(self):
+        """
+        Converts the dataframe of audio features into feature vector
+        using `self.preprocessor`.
+        """
+        audio_df = self.get_config('audio')
+        if audio_df is not None:
+            audio_features = self.preprocessor.transform(audio_df)
+        else:
+            audio_features = None
+            
+        return audio_features
+        
+    def _get_multimodal_size(self):
+        """
+        Decoder dimension - Encoder dimension = multimodal size
+        Assumes we are only generating for post-RNN model.
+        
+        Returns:
+        --------
+        multimodalsize : int
+        """
+        enc_name = 'encoder.weight'
+        dec_name = 'multidecoder.decoder.weight'
+        enc_size = self.model.state_dict()[enc_name].shape[1]
+        dec_size = self.model.state_dict()[dec_name].shape[1]
+        
+        self._multimodal_size = dec_size - enc_size
+        
     def numericalize(self, t):
         "Convert a list of tokens `t` to their ids."
         return [self.stoi.get(w, 0) for w in t]
@@ -345,17 +405,15 @@ class DeepLyric:
             result, *_ = self.model(context)
         
         elif self.model_type == 'multimodal':
-            audio_features = self.preprocessor.transform(audio).flatten()
-            #assert len(audio.shape) == 2,"audio features must be a 1xn array"
-            #audio_size = audio.shape[1]
+            audio_size = self._multimodal_size
             
-            #if audio is None:
-            #    audio_features = Tensor([0]*audio_size*len(context))\
-            #        .view(-1, 1, audio_size).cuda()
-            #else:
-            #    audio_features = np.tile(audio, len(context))
-            #    audio_features = Tensor(audio_features)\
-            #        .view(-1, 1, audio_size).cuda()
+            if audio is None:
+                audio_features = Tensor([0]*audio_size*len(context))\
+                    .view(-1, 1, audio_size).cuda()
+            else:
+                audio_features = np.tile(audio, len(context))
+                audio_features = Tensor(audio_features)\
+                    .view(-1, 1, audio_size).cuda()
             
             result, *_ = self.model(context, audio_features)
         
@@ -419,7 +477,7 @@ class DeepLyric:
         """
         ####### get params from config ############################
         # seed_text = self.get_config('seed_text')
-        seed_text = self._create_intial_context()
+        seed_text = self._create_initial_context()
         max_len = self.get_config('max_len')
         GPU = self.get_config('GPU')
         context_length = self.get_config('context_length')
@@ -427,7 +485,8 @@ class DeepLyric:
         verbose = self.get_config('verbose')
         temperature = self.get_config('temperature')
         top_k = self.get_config('top_k')
-        audio = self.get_config('audio')
+        # audio = self.get_config('audio')
+        audio = self._vectorize_audio()
         multinomial = self.get_config('multinomial')
         ###########################################################
         
@@ -530,7 +589,8 @@ class DeepLyric:
         """
         
         ####### get params from config ############################
-        seed_text = self.get_config('seed_text')
+        # seed_text = self.get_config('seed_text')
+        seed_text = self._create_initial_context()
         max_len = self.get_config('max_len')
         GPU = self.get_config('GPU')
         context_length = self.get_config('context_length')
@@ -538,7 +598,8 @@ class DeepLyric:
         verbose = self.get_config('verbose')
         temperature = self.get_config('temperature')
         top_k = self.get_config('top_k')
-        audio = self.get_config('audio')
+        # audio = self.get_config('audio')
+        audio = self._vectorize_audio()
         multinomial = self.get_config('multinomial')
         ###########################################################
         

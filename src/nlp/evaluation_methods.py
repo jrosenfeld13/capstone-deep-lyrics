@@ -17,7 +17,33 @@ import requests
 from copy import copy, deepcopy
 from enum import Enum
 
-def parse_tokens(tokens, lines=True, tags=False):
+def combine_contractions(token_list, sign="'"):
+    """
+    combine sequent items in a list that compose a single contraction. By default look for apostrophe as signal
+    
+    Input Example:
+    --------------
+    ['xbos', 'xgenre', 'death', 'metal', 'xtitle', 'and', 'i', 'don', "'t",
+     'think', 'that', 'xbol-1', 'today', 'is', 'the', 'greatest', 'day', 'ever', 'xeol',
+     'xbol-2', 'so', 'what', 'never', 'xeol', 'xeos']
+     
+    Output Example:
+    ---------------
+    ['xbos', 'xgenre', 'death', 'metal', 'xtitle', 'and', 'i', "don't",
+     'think', 'that', 'xbol-1', 'today', 'is', 'the', 'greatest', 'day', 'ever', 'xeol',
+     'xbol-2', 'so', 'what', 'never', 'xeol', 'xeos']
+    
+    """
+    newList= []
+    for token in token_list:
+        if not token.startswith(sign):
+            newList.append(token)
+        else:
+            prior = newList.pop()
+            newList.append(prior+token)
+    return newList
+
+def parse_tokens(tokens, lines=True, tags=False, contractions=False):
     """
     Parses tokens with various options for evaluation methods.
     Assumes `xbol-1` tag as first line of actual lyrics.
@@ -36,6 +62,9 @@ def parse_tokens(tokens, lines=True, tags=False):
          
           
     """
+    if contractions:
+        tokens = combine_contractions(tokens)
+    
     # lines and no tags
     if lines and not tags:
         reached_bol = False
@@ -134,10 +163,10 @@ def calculate_rhyme_density(tokens, rhymeType='perfect', rhymeLocation='all'):
     distinct_rhyme_cnt = 0
     
     if rhymeLocation == 'all':
-        tokens = parse_tokens(tokens, lines=False, tags=False)
+        tokens = parse_tokens(tokens, lines=False, tags=False, contractions=True)
         
     elif rhymeLocation == 'end':
-        tokens = [line[-1] for line in parse_tokens(tokens, lines=True, tags=False)\
+        tokens = [line[-1] for line in parse_tokens(tokens, lines=True, tags=False, contractions=True)\
                   if line]
         
     # only retrieve first pronunciation from `phones_for_words`
@@ -220,8 +249,8 @@ def bleu(tokens, ref_list, nGram=4, nGramType='cumulative', shouldSmooth=True):
                   ,('exclusive',3):(0,0,1,0)
                   ,('exclusive',4):(0,0,0,1)}
 
-    candidate = parse_tokens(tokens, lines=False, tags=False)
-    references = [parse_tokens(r, lines=False, tags=False) for r in ref_list]
+    candidate = parse_tokens(tokens, lines=False, tags=False, contractions=True)
+    references = [parse_tokens(r, lines=False, tags=False, contractions=True) for r in ref_list]
 
     weights = weight_dict[(nGramType,nGram)]
 
@@ -350,7 +379,7 @@ def findMeter(tokens):
     # initialize
     vote_cnt = Counter()
     
-    lines = parse_tokens(tokens, lines=True, tags=False)
+    lines = parse_tokens(tokens, lines=True, tags=False, contractions=True)
     line_cnt = len(lines)
     minDist = 999
 
@@ -358,14 +387,17 @@ def findMeter(tokens):
     for line in lines:
         for k,v in meter_dict.items():
             minDist = 999
-            for reading in findLineStress(line)[0]:
+            for reading in findLineStress(line):
                 dist = levenshtein(k,reading)
                 if dist < minDist:
                     minDist = dist
             vote_cnt[v] += minDist
-
-    lowest = min(vote_cnt.values())
-    options = [k for k,v in vote_cnt.items() if v==lowest]
+    
+    try:
+        lowest = min(vote_cnt.values())
+        options = [k for k,v in vote_cnt.items() if v==lowest]
+    except:
+        return None, None
     
     # use set_metric
     return options, lowest/float(line_cnt)
@@ -392,7 +424,7 @@ def get_POS_conformity(tokens):
     absdiff = 0
 
     # prepare data
-    tokenized_text = parse_tokens(tokens, lines=False, tags=False)
+    tokenized_text = parse_tokens(tokens, lines=False, tags=False, contractions=False)
     tag_list = nltk.pos_tag(tokenized_text)
 
     # initial proportions
