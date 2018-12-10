@@ -35,15 +35,15 @@ def get_itos(model_name):
     itos = pickle.loads(itos)
     return itos
 
-def get_preprocessor(model_name):
-    """
-    Retrieve preprocessor from google cloud storage
-    """
-    preprocessor_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_preprocessor.pkl'
-    preprocessor = requests.get(preprocessor_url)
-    preprocessor = preprocessor.content
-    preprocessor = pickle.loads(preprocessor)
-    return preprocessor
+#def get_preprocessor(model_name):
+#    """
+#    Retrieve preprocessor from google cloud storage
+#    """
+#    preprocessor_url = f'https://storage.googleapis.com/w210-capstone/models/{model_name}_preprocessor.pkl'
+#    preprocessor = requests.get(preprocessor_url)
+#    preprocessor = preprocessor.content
+#    preprocessor = pickle.loads(preprocessor)
+#    return preprocessor
 
 class DeepLyric:
     """
@@ -96,8 +96,6 @@ class DeepLyric:
         self.set_config(config_dict=copy(self.DEFAULT_CONFIG))
         self.set_config('model_name', model_name)
         self.model_type = model_type
-        if self.model_type == 'multimodal':
-            self.preprocessor = preprocessor
         self.set_config('model_type', model_type)
         
         if isinstance(model, str):
@@ -107,7 +105,8 @@ class DeepLyric:
         else:
             self.model = model
             self.itos = itos
-        
+            self.preprocessor = preprocessor
+                    
         self.stoi = {v:k for k,v in enumerate(self.itos)}
         
     
@@ -139,7 +138,7 @@ class DeepLyric:
         else:
             self._config = config_dict
     
-    def _create_intial_context(self):
+    def _create_initial_context(self):
         """
         Creates initial context for `generate_text()` based on
         `seed_text`, `genre`, and `title` config params
@@ -184,8 +183,14 @@ class DeepLyric:
                                               discard_empty=False)
         context = re_tk.tokenize_sents(context)[0]
 
-        context = [word.lower() for word in context]
+        context = [word.lower() for word in context]            
+        
         return context
+    
+    def vectorize_audio(self):
+        audio_df = self.get_config('audio')
+        audio_features = self.preprocessor.transform(audio_df).flatten()
+        self.audio_features = audio_features
     
     def save_json(self, dir=None, name=None, out=False, format_lyrics=False):
         """
@@ -349,20 +354,18 @@ class DeepLyric:
             result, *_ = self.model(context)
         
         elif self.model_type == 'multimodal':
-            audio_features = self.preprocessor.transform(audio).flatten()
-            #assert len(audio.shape) == 2,"audio features must be a 1xn array"
-            #audio_size = audio.shape[1]
+            assert len(audio.shape) == 2,"audio features must be a 1xn array"
+            audio_size = audio.shape[1]
             
-            #if audio is None:
-            #    audio_features = Tensor([0]*audio_size*len(context))\
-            #        .view(-1, 1, audio_size).cuda()
-            #else:
-            #    audio_features = np.tile(audio, len(context))
-            #    audio_features = Tensor(audio_features)\
-            #        .view(-1, 1, audio_size).cuda()
+            if audio is None:
+                audio_features = Tensor([0]*audio_size*len(context))\
+                    .view(-1, 1, audio_size).cuda()
+            else:
+                audio_features = np.tile(audio, len(context))
+                audio_features = Tensor(audio_features)\
+                    .view(-1, 1, audio_size).cuda()
             
             result, *_ = self.model(context, audio_features)
-        
         
         result = result[-1]
 
@@ -423,7 +426,7 @@ class DeepLyric:
         """
         ####### get params from config ############################
         # seed_text = self.get_config('seed_text')
-        seed_text = self._create_intial_context()
+        seed_text = self._create_initial_context()
         max_len = self.get_config('max_len')
         GPU = self.get_config('GPU')
         context_length = self.get_config('context_length')
@@ -431,7 +434,11 @@ class DeepLyric:
         verbose = self.get_config('verbose')
         temperature = self.get_config('temperature')
         top_k = self.get_config('top_k')
-        audio = self.get_config('audio')
+        if self.get_config('audio'):
+            audio_features = self.get_config('audio')
+            audio = self.vectorize_audio(audio_features)
+        else:
+            audio = self.get_config('audio')
         multinomial = self.get_config('multinomial')
         ###########################################################
         

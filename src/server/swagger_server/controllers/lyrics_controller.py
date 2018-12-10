@@ -10,6 +10,8 @@ from swagger_server import util
 
 from ..src.nlp.generate_lyrics import DeepLyric
 from ..src.nlp.evaluate_lyrics import Evaluator
+from ..src.nlp.preprocessor_util import log_features, bin_tempo, bin_time_signature, to_string
+
 
 def generate_lyrics(body):  # noqa: E501
     """Request lyric generation.
@@ -25,7 +27,7 @@ def generate_lyrics(body):  # noqa: E501
         body = connexion.request.get_json()  # noqa: E501
 
     ###ESTABLISH MODEL TYPE
-    body['model_type'] = 'language'
+    body['model_type'] = 'language' ##HARDCODE LANGUAGE MODEL FOR NOW
     MODEL = '4.2-LM-108k-lines-genre-song_title'
 
     if body['model_type'] == 'multimodal':
@@ -37,7 +39,6 @@ def generate_lyrics(body):  # noqa: E501
     ITOS_FILE = os.path.join(os.path.dirname(__file__), f'../../../../data/models/{MODEL}/tmp/itos.pkl')
     PREPROCESSOR_FILE = os.path.join(os.path.dirname(__file__), f'../../../../data/models/{MODEL}/{MODEL}_preprocessor.pkl')
 
-    
     with open(ARCHITCTURE_FILE, 'rb') as f:
         architecture = pickle.load(f)
     with open(ITOS_FILE, 'rb') as f:
