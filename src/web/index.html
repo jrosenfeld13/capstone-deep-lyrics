@@ -179,7 +179,7 @@ body {font-size:16px;}
     <h2 class="w3-xlarge w3-text-red"><b>Language Models, Transfer Learning & Deep Representations</b></h2>
     <p>At its core, our language model has one task: predict the most likely next word. Although this is a simple task, language models have become incredibly powerful and are being used everywhere from smartphone autocomplete to classifying the sentiment of news articles.
     At a high-level, neural language models and word embeddings like Word2Vec and GloVe learn a continuous representation of words in latent space solely in the process of trying to predict words in order. These language models already use a basic form of transfer learning and the resulting word-vector representations capture powerful, high-level information about words and sentences
-    like semantics and sytax.  
+    like semantics and sytax.
     </p>
       <div class="w3-row-padding">
         <center>
@@ -199,15 +199,15 @@ body {font-size:16px;}
           <center>
             <figure>
                 <img src="images/ulmfit.png" style="width:700px" alt="ULMFiT Training Process">
-                <figcaption>Language representation models utilize pre-training and transfer learning for improved performance. In figure a, a 3-layer LSTM is trained on a large corpus of text (Wikitext-103). In 
+                <figcaption>Language representation models utilize pre-training and transfer learning for improved performance. In figure a, a 3-layer LSTM is trained on a large corpus of text (Wikitext-103). In
                  figure b, that same language model is fine-tuned on our corpus of lyrics. Source: Universal Language Model Fine-tuning for Text Classification (Howard and Ruder, 2018)
                 </figcaption>
             </figure>
           </center>
         </div>
     <h2 class="w3-xlarge w3-text-red"><b>Multimodality</b></h2>
-    <p>As its name suggests, multimodality is the process of learning from multiple modes (a.k.a. pieces of different information). These pieces of information have different statistical distributions and all can contribute to a model's understanding of how best to solve for its 
-      end task. Most research into the realm of multimodal learning has been in computer vision, where the goal of video to text or text to image neccesitates the ability to manipulate both raw pixel info and pure language. In our case, to 
+    <p>As its name suggests, multimodality is the process of learning from multiple modes (a.k.a. pieces of different information). These pieces of information have different statistical distributions and all can contribute to a model's understanding of how best to solve for its
+      end task. Most research into the realm of multimodal learning has been in computer vision, where the goal of video to text or text to image neccesitates the ability to manipulate both raw pixel info and pure language. In our case, to
       generate lyrics, we are able to combine pure language with numerical attributes of music like tone, time signature, tempo, and more.</p>
     <p>In order to do that, we begin with the fine-tuned language model from above and experiment with various architectures that inject information about a song's musical content. In addition to genre and song-title tokens, this information further contributes to the model's understanding
       of distributions conditional on multiple modes.
@@ -227,7 +227,7 @@ body {font-size:16px;}
     <p>More specifically, in order to generate novel and potentially creative lyrics, we can't take a "greedy" approach and simply pick the next word with the highest probability. "Greedy" decoding may result in high conformity to part-of-speech rules and sentences that generally make sense, but the songs would be boring
       and likely become stuck in local minima, repeating the same lines over again. Instead, we start with two important tweaks to the decoding process, utilizing a temperature hyperparameter (scaling logits prior to the model's softmax in order to relatively increase the probabilities of "less sure words") and drawing next-word samples from a multinomial distribution rather than taking a specified top-k number of words.
     </p>
-    <p>Perhaps most crucially, we use an algorithm called beam search and apply several modifications to that, too. Beam search takes a breadth-first approach to generating possible next word options for each generated song. Through the search for next words, the algorithm keeps track of paths and their joint probabilities/scores. During each successive step, we throw away all but N number 
+    <p>Perhaps most crucially, we use an algorithm called beam search and apply several modifications to that, too. Beam search takes a breadth-first approach to generating possible next word options for each generated song. Through the search for next words, the algorithm keeps track of paths and their joint probabilities/scores. During each successive step, we throw away all but N number
       of possible songs (where N is also a tunable hyperparameter). With enough succesive iterations, our model and generator is able to draw the fine line between nonsense and beauty.
     </p>
       <center>
@@ -252,7 +252,7 @@ body {font-size:16px;}
         <img src="images/steve.jpg" alt="Steve Yang" style="width:100%">
         <div class="w3-container">
           <h3>Steve Yang</h3>
-          <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+          <p>Based out of Los Angeles, Steve is a Data Scientist at Uber. As a graduate student at UC Berkeley, he found a deep interest for NLP, Causal Experimentation, and other Machine Learning in Latent Space. Additionally, as a guitarist and electronic music producer, Steve is fascinated by research topics that blends together science and art. </p>
         </div>
       </div>
     </div>
