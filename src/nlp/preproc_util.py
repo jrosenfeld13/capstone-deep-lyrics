@@ -1,20 +1,5 @@
-#!/usr/bin/env python3
-
-import connexion
-
-from swagger_server import encoder
-from flask_cors import CORS
-
-import sys
-sys.path.insert(0, '../../../src')
-
-import os
-from pathlib import Path
-
 import pandas as pd
 import numpy as np
-
-print(Path(os.path.dirname(__file__)))
 
 def log_features(X):
     return np.log(X)
@@ -38,16 +23,3 @@ def bin_time_signature(X):
 
 def to_string(X):
     return X.astype('str')
-
-def main():
-    app = connexion.App(__name__, specification_dir='./swagger/')
-    app.app.json_encoder = encoder.JSONEncoder
-    app.add_api('swagger.yaml', arguments={'title': 'Lyrics Generation'})
-    
-    # add CORS support
-    CORS(app.app)
-    
-    app.run(port=8000)
-
-if __name__ == '__main__':
-    main()

@@ -2,9 +2,8 @@ import numpy as np
 import nltk
 from nltk.translate import bleu_score
 import nltk.tokenize
-
-#from fastai import *
-#from fastai.text import *
+from fastai import *
+from fastai.text import *
 
 from collections import Counter
 from collections import defaultdict
@@ -35,16 +34,20 @@ def combine_contraction(token_list, sign="'"):
      'xbol-2', 'so', 'what', 'never', 'xeol', 'xeos']
     
     """
-    newList= []
-    for token in token_list:
-        if not newList:
-            newList.append(token)
-        elif not token.startswith(sign):
-            newList.append(token)
-        else:
-            prior = newList.pop()
-            newList.append(prior+token)
+    try:
+        newList= []
+        for token in token_list:
+            if not newList:
+                newList.append(token)
+            elif not str(token).startswith(sign):
+                newList.append(token)
+            else:
+                prior = newList.pop()
+                newList.append(prior+token)
+    except:
+        newList = token_list
     return newList
+
 
 
 def parse_tokens(tokens, lines=True, tags=False, contraction=False):
