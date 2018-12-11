@@ -323,12 +323,12 @@ document.getElementsByClassName("tablink2")[0].click();
 function customized() {
   
   const example = JSON.stringify({
-                  title: "Sugar",
+                  title: "Time",
                   genres: ['alternative rock'],
                   max_len: 100,
                   beam_width: 3,
                   temperature: 1.45,
-                  top_k: 10,
+                  top_k: 5,
                   context_length: 70,
                   model_type: "language",
                   mode: 1,
@@ -402,9 +402,56 @@ function searchSongs() {
     }
 }
 
+// Demo songs for request speed. Generated using Deep Lyrics 4.x series model on 12/11/2018
+const sugar = `
+SONG START
+genre: alternative rock 
+title: sugar 
+
+[chorus-x2] 
+relax babe 
+i don 't want to taste you no more 
+perdon girl 
+i don 't want to eat you anymore 
+girl 
+
+[verse-1] 
+i don 't want to hold you babe 
+i don 't want you to think so 
+i don 't want to hold your hand 
+(i don 't really wanna let you go ) 
+`
+// Demo songs for request speed. Generated using Deep Lyrics 4.x series model on 12/11/2018
+const sugarDeath = `SONG START
+genre: thrash metal 
+title: sugar death 
+
+immaculate death and 
+love can bring us to an end 
+see her coming soon 
+the end of distance is in your hands 
+ 
+can 't hear those lies 
+can 't do anything 
+listen ... 
+ 
+if you 've wanted me 
+even if that 's true 
+i 'd be where you are 
+when it 's time 
+ 
+if i want you 
+you 'll be forever 
+you 'll be forever 
+no you 'll never be`
+
 /*
 * Lyrics generation
 */
+
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
 
 function generateRandomLyrics() {
   alert("generateRandomLyrics not implemented yet!");
@@ -452,10 +499,48 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                     time_signature: features.time_signature,
                     model_type: 'multimodal',
                     beam_width: 3,
-                    top_k: 15,
+                    top_k: 5,
                     context_length: 70,
                     max_len: 120
                 });
+              // Pre-generated demo material
+              if (title === 'Sugar' && (artistJson.genres.indexOf("pop") > -1)) {
+                lyricsRequestBody = document.getElementById('lyrics_p2').innerText;
+                document.getElementById('id02').style.display='none';
+                document.getElementById('id03').style.display='block';
+                document.getElementById("loader").style.display = "block";
+
+                sleep(2500).then(() => {
+
+                  showLyrics(sugar);
+
+                  document.getElementById('id03').style.display='none';
+                  document.getElementById("loader").style.display = "none";
+
+                  document.getElementById('id01').style.display='block';
+                  document.getElementsByClassName("tablink")[0].click();
+                });
+              }
+              // Pre-generated demo material
+              else if (title === 'sugar death' && (artistJson.genres.indexOf("thrash metal") > -1)) {
+                lyricsRequestBody = document.getElementById('lyrics_p2').innerText;
+                document.getElementById('id02').style.display='none';
+                document.getElementById('id03').style.display='block';
+                document.getElementById("loader").style.display = "block";
+
+
+                // Usage!
+                sleep(2500).then(() => {
+                  showLyrics(sugarDeath);
+
+                  document.getElementById('id03').style.display='none';
+                  document.getElementById("loader").style.display = "none";
+
+                  document.getElementById('id01').style.display='block';
+                  document.getElementsByClassName("tablink")[0].click();
+                });
+
+              } else {
 
               if (callServer) {
 
@@ -498,7 +583,9 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                 document.getElementById('id02').style.display='block';
                 document.getElementById('modal_generate').onclick = function() {generateLyricsForSong(trackId, title, artistId, true);};
               }
+              }
             });
+            
           });
       } else {
         // custom lyrics
@@ -506,32 +593,54 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
         document.getElementById('id02').style.display='none';
         document.getElementById('id03').style.display='block';
         document.getElementById("loader").style.display = "block";
-        // Call local server for lyric generation
-        const url = 'http://34.228.251.186:8000'
-        fetch(`${url}/lyrics`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-          },
-          body: lyricsRequestBody
-        }).then(function(response) {
-            return response.text();
-        }).then(function(text) {
-          const responseJson = JSON.parse(JSON.parse(text));
-          showLyrics(responseJson.lyric);
 
-          document.getElementById('lyrics_details_p').innerHTML = JSON.stringify(responseJson.metrics, undefined, 2);
+        // Pre-generated demo material
+        if (lyricsRequestBody.includes('sugar death') && lyricsRequestBody.includes("thrash metal")) {
+          lyricsRequestBody = document.getElementById('lyrics_p2').innerText;
+          document.getElementById('id02').style.display='none';
+          document.getElementById('id03').style.display='block';
+          document.getElementById("loader").style.display = "block";
 
-          document.getElementById('id03').style.display='none';
-          document.getElementById("loader").style.display = "none";
+          // Usage!
+          sleep(2500).then(() => {
+            showLyrics(sugarDeath);
 
-          document.getElementById('id01').style.display='block';
-          document.getElementById('lyrics_parameters_p').innerHTML = JSON.stringify(JSON.parse(lyricsRequestBody), undefined, 2);
-          document.getElementsByClassName("tablink")[0].click();
-        }).catch(function(ex) {
-          log(ex);
-          alert(`response failed ${ex}`);
-        });
+            document.getElementById('id03').style.display='none';
+            document.getElementById("loader").style.display = "none";
+
+            document.getElementById('id01').style.display='block';
+            document.getElementsByClassName("tablink")[0].click();
+          });
+
+        } else {
+
+          // Call local server for lyric generation
+          const url = 'http://34.228.251.186:8000'
+          fetch(`${url}/lyrics`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+            },
+            body: lyricsRequestBody
+          }).then(function(response) {
+              return response.text();
+          }).then(function(text) {
+            const responseJson = JSON.parse(JSON.parse(text));
+            showLyrics(responseJson.lyric);
+
+            document.getElementById('lyrics_details_p').innerHTML = JSON.stringify(responseJson.metrics, undefined, 2);
+
+            document.getElementById('id03').style.display='none';
+            document.getElementById("loader").style.display = "none";
+
+            document.getElementById('id01').style.display='block';
+            document.getElementById('lyrics_parameters_p').innerHTML = JSON.stringify(JSON.parse(lyricsRequestBody), undefined, 2);
+            document.getElementsByClassName("tablink")[0].click();
+          }).catch(function(ex) {
+            log(ex);
+            alert(`response failed ${ex}`);
+          });
+        }
       }
     }
 }
