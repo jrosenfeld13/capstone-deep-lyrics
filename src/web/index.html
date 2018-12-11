@@ -281,7 +281,7 @@ body {font-size:16px;}
         <img src="images/carlos.jpg" alt="Carlos Castro" style="width:100%">
         <div class="w3-container">
           <h3>Carlos Castro</h3>
-          <p> Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+          <p> Carlos Castro is a computer scientist at Microsoft Research, focused on infusing natural language into apps and devices to make for more powerful and accessible experiences. Carlos has a profound passion for problem solving. He consistently contributes to world class challenges in diverse domains such as bioinformatics, large scale distributed systems, real-time communications and more recently natural language.</p>
         </div>
       </div>
     </div>
@@ -327,6 +327,7 @@ function customized() {
                   genres: ['oldies', 'rock'],
                   time_signature: 4,
                   beam_width: 3,
+                  model_type: 'multimodal',
                   top_k: 15,
                   context_length: 70,
                   max_len: 120
@@ -442,6 +443,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                     title: title,
                     genres: artistJson.genres,
                     time_signature: features.time_signature,
+                    model_type: 'multimodal',
                     beam_width: 3,
                     top_k: 15,
                     context_length: 70,
@@ -468,7 +470,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                     return response.text();
                 }).then(function(text) {
 
-                    const responseJson = JSON.parse(text);
+                    const responseJson = JSON.parse(JSON.parse(text));
 
                     showLyrics(responseJson.lyric);
 
@@ -479,7 +481,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                     
                     document.getElementById('id01').style.display='block';
                     document.getElementById('lyrics_parameters_p').innerHTML = JSON.stringify(JSON.parse(lyricsRequestBody), undefined, 2);
-                    
+                    document.getElementsByClassName("tablink")[0].click();
                 }).catch(function(ex) {
                   log(ex);
                   alert(`response failed ${ex}`);
@@ -508,6 +510,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
         }).then(function(response) {
             return response.text();
         }).then(function(text) {
+          const responseJson = JSON.parse(JSON.parse(text));
           showLyrics(responseJson.lyric);
 
           document.getElementById('lyrics_details_p').innerHTML = JSON.stringify(responseJson.metrics, undefined, 2);
@@ -517,6 +520,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
 
           document.getElementById('id01').style.display='block';
           document.getElementById('lyrics_parameters_p').innerHTML = JSON.stringify(JSON.parse(lyricsRequestBody), undefined, 2);
+          document.getElementsByClassName("tablink")[0].click();
         }).catch(function(ex) {
           log(ex);
           alert(`response failed ${ex}`);
