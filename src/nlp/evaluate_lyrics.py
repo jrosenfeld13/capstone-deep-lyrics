@@ -2,8 +2,8 @@ import numpy as np
 import nltk
 from nltk.translate import bleu_score
 import nltk.tokenize
-from fastai import *
-from fastai.text import *
+#from fastai import *
+#from fastai.text import *
 
 from collections import Counter
 from collections import defaultdict
