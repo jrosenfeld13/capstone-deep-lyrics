@@ -466,7 +466,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
                 
 
                 // Call local server for lyric generation
-                const url = 'http://localhost:8000'
+                const url = 'http://34.228.251.186:8000'
                 fetch(`${url}/lyrics`, {
                     method: 'POST',
                     headers: {
@@ -507,7 +507,7 @@ function generateLyricsForSong(trackId, title, artistId, callServer, isCustom) {
         document.getElementById('id03').style.display='block';
         document.getElementById("loader").style.display = "block";
         // Call local server for lyric generation
-        const url = 'http://localhost:8000'
+        const url = 'http://34.228.251.186:8000'
         fetch(`${url}/lyrics`, {
             method: 'POST',
             headers: {
