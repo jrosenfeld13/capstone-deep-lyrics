@@ -48,13 +48,12 @@ body {font-size:16px;}
     <h1 class="w3-xxxlarge w3-text-red"><b>Deep learning based lyrics generator</b></h1>
   </div>
 
-
   <!-- Home -->
   <div class="w3-container" id="home" >
     <!-- <h1 class="w3-xxxlarge w3-text-red"><b>Services.</b></h1> -->
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>We are a interior design service that focus on what's best for your home and what's best for you!</p>
-    <p>Some text about our services - what we do and what we offer. We are lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+    <p>We are a group of UC Berkeley graduate students dissecting what it means for a machine to be creative.</p>
+    <p>Some text about our project - what we do and what we did. We are lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
     dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor
     incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
     </p>
@@ -65,7 +64,6 @@ body {font-size:16px;}
     <h1 class="w3-xxxlarge w3-text-red"><b>Try it out!</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p>Do you want to try our lyrics generator? Login to Spotify to choose a song and we'll generate lyrics from it, or generate a custom lyric by giving us information such as genre, title and technical details.</p>
-
 
     <h2 class="w3-xlarge w3-text-red"><b>Spotify Song Lyric Generation</b></h2>
     Search for songs in Spotify, and we'll generate a lyric for it using the audio information. If you are an advanced user and want to further customize your lyrics technical parameters, we'll show you the advanced lyric parameters and you can edit them to make your perfect lyric!
@@ -150,7 +148,7 @@ body {font-size:16px;}
           <h2>Deep Lyrics Settings</h2>
           Click on the 'Generate' button to get your lyrics.
           If you want to customize how we generate those lyrics, edit the parameters below.
-          Generating a new lyrics for summertime, but want it with an oldies twist? Add an 'oldies' genre!
+          Generating new lyrics for a summertime feel, but want it with an oldies twist? Simply add an 'oldies' genre!
          </header>
          <button class="tablink2 w3-bar-item w3-button" onclick="openSection(event, 'generated_lyrics2')">Lyrics settings</button>
          <div id="generated_lyrics2" class="w3-container city2">
@@ -177,21 +175,73 @@ body {font-size:16px;}
   <div class="w3-container" id="works" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>How it works</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>Here's how we did it.</p>
-    <p>Lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor
-    incididunt ut labore et quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    <p>An explanation of some of the more technical details.</p>
+    <h2 class="w3-xlarge w3-text-red"><b>Language Models, Transfer Learning & Deep Representations</b></h2>
+    <p>At its core, our language model has one task: predict the most likely next word. Although this is a simple task, language models have become incredibly powerful and are being used everywhere from smartphone autocomplete to classifying the sentiment of news articles.
+    At a high-level, neural language models and word embeddings like Word2Vec and GloVe learn a continuous representation of words in latent space solely in the process of trying to predict words in order. These language models already use a basic form of transfer learning and the resulting word-vector representations capture powerful, high-level information about words and sentences
+    like semantics and sytax.  
     </p>
-  </div>
+      <div class="w3-row-padding">
+        <center>
+          <figure>
+              <img src="images/wordrelations.png" style="width:700px" alt="Word Relations with Word2Vec">
+              <figcaption>"Simple" neural language models and their word-embeddings are able to learn word relations and semantic meaning. Source: https://thegradient.pub/nlp-imagenet/ and TensorFlow tutorial</figcaption>
+          </figure>
+        </center>
+      </div>
+      <p>More recently, language representation models (Deep Representations) like ULMFiT (Howard and Ruder, 2018), Open AI's Transformer (Radford et al., 2018) and Google's BERT (Devlin et al., 2018) have all been able to further leverage transfer learning and build upon
+        the success of extracted, static word-embeddings in order to improve model perplexities and performance on downstream target tasks. Rather than extracting a single vector of word embeddings, these newer models "obtain the vectors of each of the internal functional states of every layer, and combine them in a weighted fashion to get the final embeddings" (<a href="https://medium.com/explorations-in-language-and-learning/transfer-learning-in-nlp-2d09c3dfaeb6">Desh Raj</a>). These approaches will soon be ubiquitous in NLP tasks.</p>
+      <p>Our lyrics generation model is built upon ULMFiT which uses a 3-layer AWD-LSTM (Merity et. al, 2017), pretrained on a large corpus of Wikipedia entries. Following this pre-training, we unfreeze the model's parameters and continue to train on a corpus of ~500k songs.
+        Through this process, we maintain the model's learned representations of syntax, semantics, and context, while also learning poetry and song specific information like meter, rhyme, and anaphora. In this step, we also include special tokens for genre and song title in order to conditionally
+        learn different distributions based on those attributes.
+      </p>
+      <div class="w3-row-padding">
+          <center>
+            <figure>
+                <img src="images/ulmfit.png" style="width:700px" alt="ULMFiT Training Process">
+                <figcaption>Language representation models utilize pre-training and transfer learning for improved performance. In figure a, a 3-layer LSTM is trained on a large corpus of text (Wikitext-103). In 
+                 figure b, that same language model is fine-tuned on our corpus of lyrics. Source: Universal Language Model Fine-tuning for Text Classification (Howard and Ruder, 2018)
+                </figcaption>
+            </figure>
+          </center>
+        </div>
+    <h2 class="w3-xlarge w3-text-red"><b>Multimodality</b></h2>
+    <p>As its name suggests, multimodality is the process of learning from multiple modes (a.k.a. pieces of different information). These pieces of information have different statistical distributions and all can contribute to a model's understanding of how best to solve for its 
+      end task. Most research into the realm of multimodal learning has been in computer vision, where the goal of video to text or text to image neccesitates the ability to manipulate both raw pixel info and pure language. In our case, to 
+      generate lyrics, we are able to combine pure language with numerical attributes of music like tone, time signature, tempo, and more.</p>
+    <p>In order to do that, we begin with the fine-tuned language model from above and experiment with various architectures that inject information about a song's musical content. In addition to genre and song-title tokens, this information further contributes to the model's understanding
+      of distributions conditional on multiple modes.
+    </p>
+      <center>
+          <figure>
+              <img src="images/multimodal.png" style="width:700px" alt="Multimodal Architecture">
+              <figcaption>A representation of the first step in one of our multimodal language model architectures.
+              </figcaption>
+          </figure>
+        </center>
+      </div>
     
+    <h2 class="w3-xlarge w3-text-red"><b>Generation & Beam Search</b></h2>
+    <p>If the language models we saw above learn the rules, then the generator breaks them. So far, we've only talked about the output of a model being to predict the next word or lyric, but we haven't
+      said anything about generating an entire song.</p>
+    <p>More specifically, in order to generate novel and potentially creative lyrics, we can't take a "greedy" approach and simply pick the next word with the highest probability. "Greedy" decoding may result in high conformity to part-of-speech rules and sentences that generally make sense, but the songs would be boring
+      and likely become stuck in local minima, repeating the same lines over again. Instead, we start with two important tweaks to the decoding process, utilizing a temperature hyperparameter (scaling logits prior to the model's softmax in order to relatively increase the probabilities of "less sure words") and drawing next-word samples from a multinomial distribution rather than taking a specified top-k number of words.
+    </p>
+    <p>Perhaps most crucially, we use an algorithm called beam search and apply several modifications to that, too. Beam search takes a breadth-first approach to generating possible next word options for each generated song. Through the search for next words, the algorithm keeps track of paths and their joint probabilities/scores. During each successive step, we throw away all but N number 
+      of possible songs (where N is also a tunable hyperparameter). With enough succesive iterations, our model and generator is able to draw the fine line between nonsense and beauty.
+    </p>
+      <center>
+          <figure>
+              <img src="images/searchtree.png" style="width:700px" alt="Beam Search Vizualization">
+              <figcaption>A glimpse into the search tree from a random sample of our model and generator. Each node represents a possible next word. The path of blue nodes represents the "winning" song.</figcaption>
+          </figure>
+      </center>
+        
   <!-- The team -->
   <div class="w3-container" id="team" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Meet the team</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>The best team in the world.</p>
-    <p>We are lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor
-    incididunt ut labore et quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    <p>We are a team of UC Berkeley MIDS students. DeepLyrics represents the culmination of our efforts through our Capstone course.
     </p>
   </div>
 
@@ -199,28 +249,30 @@ body {font-size:16px;}
   <div class="w3-row-padding w3-grayscale">
     <div class="w3-col m3 w3-margin-bottom">
       <div class="w3-light-grey">
-        <!-- <img src="/w3images/team2.jpg" alt="John" style="width:100%"> -->
+        <img src="images/steve.jpg" alt="Steve Yang" style="width:100%">
         <div class="w3-container">
-          <h3>Steve</h3>
+          <h3>Steve Yang</h3>
           <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
         </div>
       </div>
     </div>
     <div class="w3-col m3 w3-margin-bottom">
       <div class="w3-light-grey">
-        <!-- <img src="/w3images/team1.jpg" alt="Jane" style="width:100%"> -->
+        <img src="images/jason.jpg" alt="Jason Rosenfeld" style="width:100%">
         <div class="w3-container">
-          <h3>Jason</h3>
-          <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+          <h3>Jason Rosenfeld</h3>
+          <p>Jason lives in New York City and works as a Data Scientist at Millennium Management. He has become interested in the field of Natural Language Processing (Understanding) through the curious combination
+              of his other passions: life-long learning, behavioral economics, decentralization, and probability. He can explain.
+          </p>
         </div>
       </div>
     </div>
     <div class="w3-col m3 w3-margin-bottom">
       <div class="w3-light-grey">
-        <!-- <img src="/w3images/team3.jpg" alt="Mike" style="width:100%"> -->
-        <div class="w3-container">
-          <h3>Justin</h3>
-          <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+          <img src="images/justin.jpg" alt="Justin Plumley" style="width:100%">
+          <div class="w3-container">
+          <h3>Justin Plumley</h3>
+          <p>Justin works in dedication to improving healthcare through data science. Enjoying a life-long love of math and storytelling, he has a strong interest with something that sits between the two--language. He resides in North Carolina with his wife and children, who continue to create all of his favorite stories.</p>
         </div>
       </div>
     </div>
@@ -234,6 +286,7 @@ body {font-size:16px;}
       </div>
     </div>
   </div>
+</div>
 
 <!-- End page content -->
 </div>
