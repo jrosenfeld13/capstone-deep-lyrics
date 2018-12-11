@@ -17,7 +17,7 @@ import requests
 from copy import copy, deepcopy
 from enum import Enum
 
-def combine_contractions(token_list, sign="'"):
+def combine_contraction(token_list, sign="'"):
     """
     combine sequent items in a list that compose a single contraction. By default look for apostrophe as signal
     
@@ -34,16 +34,23 @@ def combine_contractions(token_list, sign="'"):
      'xbol-2', 'so', 'what', 'never', 'xeol', 'xeos']
     
     """
-    newList= []
-    for token in token_list:
-        if not token.startswith(sign):
-            newList.append(token)
-        else:
-            prior = newList.pop()
-            newList.append(prior+token)
+    try:
+        newList= []
+        for token in token_list:
+            if not newList:
+                newList.append(token)
+            elif not str(token).startswith(sign):
+                newList.append(token)
+            else:
+                prior = newList.pop()
+                newList.append(prior+token)
+    except:
+        newList = token_list
     return newList
 
-def parse_tokens(tokens, lines=True, tags=False, contractions=False):
+
+
+def parse_tokens(tokens, lines=True, tags=False, contraction=False):
     """
     Parses tokens with various options for evaluation methods.
     Assumes `xbol-1` tag as first line of actual lyrics.
@@ -62,10 +69,13 @@ def parse_tokens(tokens, lines=True, tags=False, contractions=False):
          
           
     """
-    if contractions:
-        tokens = combine_contractions(tokens)
-    
     # lines and no tags
+    if contraction:
+        tokens = combine_contraction(tokens)
+
+    if tokens and not tokens[-1] == 'xeos':
+        tokens.append('xeos')
+        
     if lines and not tags:
         reached_bol = False
         parsed_tokens = []
@@ -163,10 +173,10 @@ def calculate_rhyme_density(tokens, rhymeType='perfect', rhymeLocation='all'):
     distinct_rhyme_cnt = 0
     
     if rhymeLocation == 'all':
-        tokens = parse_tokens(tokens, lines=False, tags=False, contractions=True)
+        tokens = parse_tokens(tokens, lines=False, tags=False, contraction=True)
         
     elif rhymeLocation == 'end':
-        tokens = [line[-1] for line in parse_tokens(tokens, lines=True, tags=False, contractions=True)\
+        tokens = [line[-1] for line in parse_tokens(tokens, lines=True, tags=False, contraction=True)\
                   if line]
         
     # only retrieve first pronunciation from `phones_for_words`
@@ -249,8 +259,8 @@ def bleu(tokens, ref_list, nGram=4, nGramType='cumulative', shouldSmooth=True):
                   ,('exclusive',3):(0,0,1,0)
                   ,('exclusive',4):(0,0,0,1)}
 
-    candidate = parse_tokens(tokens, lines=False, tags=False, contractions=True)
-    references = [parse_tokens(r, lines=False, tags=False, contractions=True) for r in ref_list]
+    candidate = parse_tokens(tokens, lines=False, tags=False, contraction=True)
+    references = [parse_tokens(r, lines=False, tags=False, contraction=True) for r in ref_list]
 
     weights = weight_dict[(nGramType,nGram)]
 
@@ -258,7 +268,7 @@ def bleu(tokens, ref_list, nGram=4, nGramType='cumulative', shouldSmooth=True):
     if shouldSmooth==True:
         smoother = bleu_score.SmoothingFunction().method5
     else:
-        smoother = None
+        smoother = bleu_score.SmoothingFunction().method1
     score = bleu_score.sentence_bleu(references, candidate, weights, smoothing_function=smoother)
     return score
 
@@ -378,29 +388,32 @@ def findMeter(tokens):
 
     # initialize
     vote_cnt = Counter()
-    
-    lines = parse_tokens(tokens, lines=True, tags=False, contractions=True)
-    line_cnt = len(lines)
-    minDist = 999
-
-    # update distances
-    for line in lines:
-        for k,v in meter_dict.items():
-            minDist = 999
-            for reading in findLineStress(line):
-                dist = levenshtein(k,reading)
-                if dist < minDist:
-                    minDist = dist
-            vote_cnt[v] += minDist
-    
     try:
+        lines = parse_tokens(tokens, lines=True, tags=False, contraction=True)
+        line_cnt = len(lines)
+        minDist = 999
+
+        # update distances
+        for line in lines:
+            for k,v in meter_dict.items():
+                minDist = 999
+                for reading in findLineStress(line):
+                    dist = levenshtein(k,reading)
+                    if dist < minDist:
+                        minDist = dist
+                vote_cnt[v] += minDist
+
         lowest = min(vote_cnt.values())
         options = [k for k,v in vote_cnt.items() if v==lowest]
-    except:
-        return None, None
+        editsPerLine = lowest/float(line_cnt)
     
-    # use set_metric
-    return options, lowest/float(line_cnt)
+    except:
+        options = None
+        editsPerLine = None
+    
+    finally:
+        # use set_metric
+        return options, editsPerLine
 
 def get_POS_conformity(tokens):
     """
@@ -424,7 +437,7 @@ def get_POS_conformity(tokens):
     absdiff = 0
 
     # prepare data
-    tokenized_text = parse_tokens(tokens, lines=False, tags=False, contractions=False)
+    tokenized_text = parse_tokens(tokens, lines=False, tags=False, contraction=False)
     tag_list = nltk.pos_tag(tokenized_text)
 
     # initial proportions
