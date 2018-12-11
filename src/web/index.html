@@ -48,13 +48,12 @@ body {font-size:16px;}
     <h1 class="w3-xxxlarge w3-text-red"><b>Deep learning based lyrics generator</b></h1>
   </div>
 
-
   <!-- Home -->
   <div class="w3-container" id="home" >
     <!-- <h1 class="w3-xxxlarge w3-text-red"><b>Services.</b></h1> -->
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>We are a interior design service that focus on what's best for your home and what's best for you!</p>
-    <p>Some text about our services - what we do and what we offer. We are lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+    <p>We are a group of UC Berkeley graduate students dissecting what it means for a machine to be creative.</p>
+    <p>Some text about our project - what we do and what we did. We are lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
     dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor
     incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
     </p>
@@ -65,7 +64,6 @@ body {font-size:16px;}
     <h1 class="w3-xxxlarge w3-text-red"><b>Try it out!</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p>Do you want to try our lyrics generator? Login to Spotify to choose a song and we'll generate lyrics from it, or generate a custom lyric by giving us information such as genre, title and technical details.</p>
-
 
     <h2 class="w3-xlarge w3-text-red"><b>Spotify Song Lyric Generation</b></h2>
     Search for songs in Spotify, and we'll generate a lyric for it using the audio information. If you are an advanced user and want to further customize your lyrics technical parameters, we'll show you the advanced lyric parameters and you can edit them to make your perfect lyric!
@@ -180,7 +178,7 @@ body {font-size:16px;}
     <p>An explanation of some of the more technical details.</p>
     <h2 class="w3-xlarge w3-text-red"><b>Language Models, Transfer Learning & Deep Representations</b></h2>
     <p>At its core, our language model has one task: predict the most likely next word. Although this is a simple task, language models have become incredibly powerful and are being used everywhere from smartphone autocomplete to classifying the sentiment of news articles.
-    At a high-level, neural language models and word embeddings like Word2Vec and GloVe learn a continuous representation of words in latent space solely in the process of predicting words in order. This process already represents a basic form of transfer learning and the resulting vector representations capture powerful, high-level information about words and sentences
+    At a high-level, neural language models and word embeddings like Word2Vec and GloVe learn a continuous representation of words in latent space solely in the process of trying to predict words in order. These language models already use a basic form of transfer learning and the resulting word-vector representations capture powerful, high-level information about words and sentences
     like semantics and sytax.  
     </p>
       <div class="w3-row-padding">
@@ -225,14 +223,17 @@ body {font-size:16px;}
     
     <h2 class="w3-xlarge w3-text-red"><b>Generation & Beam Search</b></h2>
     <p>If the language models we saw above learn the rules, then the generator breaks them. So far, we've only talked about the output of a model being to predict the next word or lyric, but we haven't
-      said anything about generating an entire song. </p>
-      <p>More specifically, in order to generate novel and potentially creative lyrics, we can't take a "greedy" approach and simply pick the next word with the highest probability. Instead, we start with two important tweaks
-      utilizing a temperature hyperparameter (scaling logits prior to the model's softmax in order to relatively increase the probabilities of less sure words) and drawing samples from a multinomial distribution. Next, we use an algorithm called beam search
-      in order to </p>
+      said anything about generating an entire song.</p>
+    <p>More specifically, in order to generate novel and potentially creative lyrics, we can't take a "greedy" approach and simply pick the next word with the highest probability. "Greedy" decoding may result in high conformity to part-of-speech rules and sentences that generally make sense, but the songs would be boring
+      and likely become stuck in local minima, repeating the same lines over again. Instead, we start with two important tweaks to the decoding process, utilizing a temperature hyperparameter (scaling logits prior to the model's softmax in order to relatively increase the probabilities of "less sure words") and drawing next-word samples from a multinomial distribution rather than taking a specified top-k number of words.
+    </p>
+    <p>Perhaps most crucially, we use an algorithm called beam search and apply several modifications to that, too. Beam search takes a breadth-first approach to generating possible next word options for each generated song. Through the search for next words, the algorithm keeps track of paths and their joint probabilities/scores. During each successive step, we throw away all but N number 
+      of possible songs (where N is also a tunable hyperparameter). With enough succesive iterations, our model and generator is able to draw the fine line between nonsense and beauty.
+    </p>
       <center>
           <figure>
               <img src="images/searchtree.png" style="width:700px" alt="Beam Search Vizualization">
-              <figcaption>A glimpse into the search tree from a random sample of our model and generator. Each node represents a possible next word.</figcaption>
+              <figcaption>A glimpse into the search tree from a random sample of our model and generator. Each node represents a possible next word. The path of blue nodes represents the "winning" song.</figcaption>
           </figure>
       </center>
         
@@ -240,8 +241,7 @@ body {font-size:16px;}
   <div class="w3-container" id="team" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Meet the team</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>The best team in the world.</p>
-    <p>We are a team of UC Berkeley MIDS students.
+    <p>We are a team of UC Berkeley MIDS students. DeepLyrics represents the culmination of our efforts through our Capstone course.
     </p>
   </div>
 
@@ -261,7 +261,9 @@ body {font-size:16px;}
         <img src="images/jason.jpg" alt="Jason Rosenfeld" style="width:100%">
         <div class="w3-container">
           <h3>Jason Rosenfeld</h3>
-          <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+          <p>Jason lives in New York City and works as a Data Scientist at Millennium Management. He has become interested in the field of Natural Language Processing (Understanding) through the curious combination
+              of his other passions: life-long learning, behavioral economics, decentralization, and probability. He can explain.
+          </p>
         </div>
       </div>
     </div>
