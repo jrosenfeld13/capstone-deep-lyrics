@@ -71,8 +71,17 @@ body {font-size:16px;}
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p>Do you want to try our lyrics generator? Login to Spotify to choose a song and we'll generate lyrics from it, or generate a custom lyric by giving us information such as genre, title and technical details.</p>
 
-    <h2 class="w3-xlarge w3-text-red"><b>Spotify Song Lyric Generation</b></h2>
-    Search for songs in Spotify, and we'll generate a lyric for it using the audio information. If you are an advanced user and want to further customize your lyrics technical parameters, we'll show you the advanced lyric parameters and you can edit them to make your perfect lyric!
+    <h2 class="w3-xlarge w3-text-red"><b>1) Randomized Lyric Generation</b></h2>
+    <p>For a randomly generated song, click "Randomize" and then "Generate." Depending on server load, songs may take anywhere between 30 seconds and 2 minutes to generate.</p>
+    <p>If you have a particular genre or title you want the song to conform to, click customize and fill in the genre and title attributes. If you'd like
+      create a lyric based on attributes of the song, fill in the advanced parameter attributes such as danceability, mode or genre and set the model type to "multimodal".
+       We'll provide you with some options to get you started and you can modify and customize them!</p>
+    <button type="button" onclick="javascript:customized()" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Randomize</button>   
+    
+    <center><h3 class="w3-xlarge w3-text-black">OR</h3></center>
+
+    <h2 class="w3-xlarge w3-text-red"><b>2) Spotify Song Lyric Generation</b></h2>
+    Alternatively, search for songs in Spotify and we'll generate a lyric for it using the audio information. If you are an advanced user and want to further customize your lyrics technical parameters, we'll show you the advanced lyric parameters and you can edit them to make your perfect lyric!
     <!-- <form action="javascript:()"> -->
       <div class="w3-section">
         <label>Song or artist search terms</label>
@@ -91,9 +100,6 @@ body {font-size:16px;}
     <div id="song_search_results" class="w3-row-padding w3-grayscale">
     </div>
     
-    <h2 class="w3-xlarge w3-text-red"><b>Customized Lyric Generation</b></h2>
-    If you don't have any song in particular you want a lyric for, we can just create a lyric based on general parameters such as danceability, mode or genre. We'll provide you with some options to get you started and you can modify and customize them!
-    <button type="button" onclick="javascript:customized()" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Customize</button>
   </div>
   
       <!-- Lyric result tabbed modal -->
@@ -141,7 +147,7 @@ body {font-size:16px;}
 
        <div id="id03" class="w3-modal">
         <div class="w3-modal-content w3-card-4 w3-animate-zoom">
-          <div id="loader"></div>
+            <div id="loader"></div>
         </div>
        </div>
        
@@ -159,7 +165,11 @@ body {font-size:16px;}
          <button class="tablink2 w3-bar-item w3-button" onclick="openSection(event, 'generated_lyrics2')">Lyrics settings</button>
          <div id="generated_lyrics2" class="w3-container city2">
           <h1>Lyrics Configuration</h1>
-          <div id="lyrics_div2" class="m4 w3-margin-bottom"  >
+          <div id="lyrics_div2" class="m4 w3-margin-bottom">
+            <form>
+                  Title: <input type="text" name="songTitle"/>
+                  Genre: <input type="text" name="songGenre"/>
+            </form>
             <div class="w3-light-grey">
               <div class="w3-container">
                 <p id="lyrics_p2" contenteditable="true"></p>
@@ -172,7 +182,7 @@ body {font-size:16px;}
 
          <div class="w3-container w3-light-grey w3-padding">
           <button class="w3-button w3-right w3-white w3-border"
-          onclick="document.getElementById('id02').style.display='none'">Close</button>
+          onclick="document.getElementById('id02').style.display='none'">Close </button>
          </div>
         </div>
        </div>
@@ -225,7 +235,6 @@ body {font-size:16px;}
               </figcaption>
           </figure>
         </center>
-      </div>
     
     <h2 class="w3-xlarge w3-text-red"><b>Generation & Beam Search</b></h2>
     <p>If the language models we saw above learn the rules, then the generator breaks them. So far, we've only talked about the output of a model being to predict the next word or lyric, but we haven't
@@ -242,6 +251,9 @@ body {font-size:16px;}
               <figcaption>A glimpse into the search tree from a random sample of our model and generator. Each node represents a possible next word. The path of blue nodes represents the "winning" song.</figcaption>
           </figure>
       </center>
+  </div>
+    
+
         
   <!-- The team -->
   <div class="w3-container" id="team" style="margin-top:75px">
@@ -323,13 +335,13 @@ document.getElementsByClassName("tablink2")[0].click();
 function customized() {
   
   const example = JSON.stringify({
-                  title: "Time",
-                  genres: ['alternative rock'],
-                  max_len: 100,
+                  title: "",
+                  genres: [''],
+                  max_len: 110,
                   beam_width: 3,
-                  temperature: 1.45,
+                  temperature: 1.5,
                   top_k: 5,
-                  context_length: 70,
+                  context_length: 60,
                   model_type: "language",
                   mode: 1,
                   energy: 0.87,
@@ -340,6 +352,7 @@ function customized() {
                   time_signature: 4
               });
 
+  
   document.getElementById('modal_generate').onclick = function() {generateLyricsForSong(null, null, null, false, true);};
   document.getElementById('lyrics_p2').innerText = example;
   document.getElementById('id02').style.display='block';
@@ -666,6 +679,20 @@ function showLyrics(lyrics) {
   //document.getElementById("lyrics_div").style.display = "block";
   var captionText = document.getElementById("lyrics_p");
   captionText.innerText = lyrics;
+  // var newtext = "";
+  // var i = 0;
+  
+  // function printLyrics(lyrics, i) {
+  // if(i < lyrics.length) {
+  //   //newtext += lyrics.charAt(i)
+  //   newtext = lyrics
+  //   captionText.innerText = newtext;
+  //   sleep(1500).then(() => {
+  //      printLyrics(lyrics, i+1);
+  //    });
+  //   }
+  // } 
+  // printLyrics(lyrics)
 }
 
 function hideLyrics() {
